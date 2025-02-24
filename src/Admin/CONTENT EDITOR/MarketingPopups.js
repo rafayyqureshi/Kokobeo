@@ -7,13 +7,29 @@ import {
   MousePointer, BarChart2, Settings, Maximize2, MoveIcon,
   FileText, ExternalLink, AlertCircle, Monitor,
   ArrowDown, ArrowUp, ChevronDown, ChevronRight,
-  Link, Lock, LockIcon, UnlockIcon, Star,
-  Save, Copy, Archive, Sun, Moon
+  Link, Lock, LockIcon, UnlockIcon, Star, BellIcon,
+  Save, Copy, Archive, Sun, Moon, Bell, Camera, Video,
+  UserX, Ban
 } from 'lucide-react';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/badge';
 import AdminHeader from '../../Headers/AdminHeader';
+
+// Tab Button Component
+const TabButton = ({ active, label, icon: Icon, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors whitespace-nowrap text-sm sm:text-base ${
+      active 
+        ? 'bg-blue-100 text-blue-700' 
+        : 'text-gray-600 hover:bg-gray-100'
+    }`}
+  >
+    <Icon className="h-4 w-4" />
+    <span>{label}</span>
+  </button>
+);
 
 const MarketingPopups = () => {
   const [selectedPopup, setSelectedPopup] = useState(null);
@@ -22,8 +38,11 @@ const MarketingPopups = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('active');
+  const [activeTab, setActiveTab] = useState('popups');
   const [showDesignEditor, setShowDesignEditor] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Sample popups data with expanded structure
   const popups = [
@@ -109,6 +128,470 @@ const MarketingPopups = () => {
     },
     {
       id: 2,
+      name: "Professional Page Welcome",
+      type: "welcome",
+      category: "general",
+      status: "active",
+      pageLocation: "professional",
+      displayLocation: "center",
+      timing: {
+        startDate: "2024-02-01",
+        endDate: "2024-12-31",
+        displayFrequency: "once-per-session",
+        delay: "2 seconds",
+        showTime: {
+          start: "00:00",
+          end: "23:59"
+        }
+      },
+      content: {
+        title: "Become a Kokobeo Professional",
+        description: "Join our network of trusted professionals and grow your business. Receive job requests and connect with clients in your area.",
+        primaryButton: {
+          text: "Sign Up Now",
+          link: "/professional/register",
+          style: "primary"
+        },
+        secondaryButton: {
+          text: "Learn More",
+          link: "/professional/benefits",
+          style: "outline"
+        },
+        image: "/professional-banner.jpg",
+        videoUrl: null
+      },
+      targeting: {
+        audience: "new-visitors",
+        devices: ["all"],
+        locations: ["all"],
+        language: ["all"],
+        userType: ["guest"],
+        urlPatterns: ["/professional*"]
+      },
+      design: {
+        theme: "light",
+        animation: "fade",
+        overlay: true,
+        width: "600px",
+        height: "auto",
+        cornerRadius: "8px",
+        colors: {
+          background: "#FFFFFF",
+          text: "#1F2937",
+          primary: "#2563EB",
+          secondary: "#6B7280"
+        },
+        typography: {
+          titleSize: "24px",
+          descriptionSize: "16px",
+          fontFamily: "Inter, sans-serif"
+        },
+        spacing: {
+          padding: "24px",
+          gap: "16px"
+        }
+      },
+      behavior: {
+        closeOnOverlayClick: true,
+        closeOnEscape: true,
+        showCloseButton: true,
+        autoClose: null,
+        scrollBehavior: "allow"
+      },
+      performance: {
+        impressions: 8200,
+        clicks: 2100,
+        dismissals: 6100,
+        conversionRate: "25.6%",
+        avgViewTime: "52 seconds"
+      }
+    },
+    {
+      id: 3,
+      name: "International Professionals Popup",
+      type: "welcome",
+      category: "general",
+      status: "active",
+      pageLocation: "international-professionals",
+      displayLocation: "center",
+      timing: {
+        startDate: "2024-02-15",
+        endDate: null,
+        displayFrequency: "once-per-session",
+        delay: "2 seconds",
+        showTime: {
+          start: "00:00",
+          end: "23:59"
+        }
+      },
+      content: {
+        title: "Global Opportunities Await",
+        description: "Expand your business internationally with Kokobeo. Connect with clients around the world and grow your professional network.",
+        primaryButton: {
+          text: "Join Now",
+          link: "/international-professionals/register",
+          style: "primary"
+        },
+        secondaryButton: {
+          text: "How It Works",
+          link: "/international-professionals/info",
+          style: "outline"
+        },
+        image: "/international-banner.jpg",
+        videoUrl: null
+      },
+      targeting: {
+        audience: "new-visitors",
+        devices: ["all"],
+        locations: ["all"],
+        language: ["all"],
+        userType: ["guest"],
+        urlPatterns: ["/international-professionals*"]
+      },
+      design: {
+        theme: "light",
+        animation: "slide",
+        overlay: true,
+        width: "600px",
+        height: "auto",
+        cornerRadius: "8px",
+        colors: {
+          background: "#FFFFFF",
+          text: "#1F2937",
+          primary: "#2563EB",
+          secondary: "#6B7280"
+        },
+        typography: {
+          titleSize: "24px",
+          descriptionSize: "16px",
+          fontFamily: "Inter, sans-serif"
+        },
+        spacing: {
+          padding: "24px",
+          gap: "16px"
+        }
+      },
+      behavior: {
+        closeOnOverlayClick: true,
+        closeOnEscape: true,
+        showCloseButton: true,
+        autoClose: null,
+        scrollBehavior: "allow"
+      },
+      performance: {
+        impressions: 5400,
+        clicks: 1250,
+        dismissals: 4150,
+        conversionRate: "23.1%",
+        avgViewTime: "48 seconds"
+      }
+    },
+    {
+      id: 4,
+      name: "Footer - How It Works",
+      type: "footer",
+      category: "informational",
+      status: "active",
+      pageLocation: "homepage",
+      displayLocation: "bottom",
+      timing: {
+        startDate: "2024-01-01",
+        endDate: null,
+        displayFrequency: "always",
+        delay: "0 seconds",
+        showTime: {
+          start: "00:00",
+          end: "23:59"
+        }
+      },
+      content: {
+        title: "How Kokobeo Works",
+        description: "Request quotes from qualified professionals or hire directly. We connect you with the right experts for your needs.",
+        primaryButton: {
+          text: "Learn More",
+          link: "/how-it-works",
+          style: "primary"
+        },
+        secondaryButton: null,
+        image: "/how-it-works-icon.png",
+        videoUrl: null
+      },
+      targeting: {
+        audience: "all-visitors",
+        devices: ["all"],
+        locations: ["all"],
+        language: ["all"],
+        userType: ["all"],
+        urlPatterns: ["/*"]
+      },
+      design: {
+        theme: "light",
+        animation: "none",
+        overlay: false,
+        width: "100%",
+        height: "auto",
+        cornerRadius: "0px",
+        colors: {
+          background: "#F3F4F6",
+          text: "#1F2937",
+          primary: "#2563EB",
+          secondary: "#6B7280"
+        },
+        typography: {
+          titleSize: "18px",
+          descriptionSize: "14px",
+          fontFamily: "Inter, sans-serif"
+        },
+        spacing: {
+          padding: "16px",
+          gap: "12px"
+        }
+      },
+      behavior: {
+        closeOnOverlayClick: false,
+        closeOnEscape: false,
+        showCloseButton: false,
+        autoClose: null,
+        scrollBehavior: "allow"
+      },
+      performance: {
+        impressions: 45000,
+        clicks: 3850,
+        dismissals: 0,
+        conversionRate: "8.6%",
+        avgViewTime: "N/A"
+      }
+    },
+    {
+      id: 5,
+      name: "Footer - Hire Professionals",
+      type: "footer",
+      category: "conversion",
+      status: "active",
+      pageLocation: "all",
+      displayLocation: "bottom",
+      timing: {
+        startDate: "2024-01-01",
+        endDate: null,
+        displayFrequency: "always",
+        delay: "0 seconds",
+        showTime: {
+          start: "00:00",
+          end: "23:59"
+        }
+      },
+      content: {
+        title: "Hire Quality Professionals",
+        description: "Find vetted experts for any job. Browse profiles, reviews, and portfolios to make the right choice.",
+        primaryButton: {
+          text: "Find Pros",
+          link: "/professionals",
+          style: "primary"
+        },
+        secondaryButton: null,
+        image: "/find-pros-icon.png",
+        videoUrl: null
+      },
+      targeting: {
+        audience: "all-visitors",
+        devices: ["all"],
+        locations: ["all"],
+        language: ["all"],
+        userType: ["all"],
+        urlPatterns: ["/*"]
+      },
+      design: {
+        theme: "light",
+        animation: "none",
+        overlay: false,
+        width: "100%",
+        height: "auto",
+        cornerRadius: "0px",
+        colors: {
+          background: "#F3F4F6",
+          text: "#1F2937",
+          primary: "#2563EB",
+          secondary: "#6B7280"
+        },
+        typography: {
+          titleSize: "18px",
+          descriptionSize: "14px",
+          fontFamily: "Inter, sans-serif"
+        },
+        spacing: {
+          padding: "16px",
+          gap: "12px"
+        }
+      },
+      behavior: {
+        closeOnOverlayClick: false,
+        closeOnEscape: false,
+        showCloseButton: false,
+        autoClose: null,
+        scrollBehavior: "allow"
+      },
+      performance: {
+        impressions: 42000,
+        clicks: 4100,
+        dismissals: 0,
+        conversionRate: "9.8%",
+        avgViewTime: "N/A"
+      }
+    },
+    {
+      id: 6,
+      name: "Footer - Get Quotes",
+      type: "footer",
+      category: "conversion",
+      status: "active",
+      pageLocation: "all",
+      displayLocation: "bottom",
+      timing: {
+        startDate: "2024-01-01",
+        endDate: null,
+        displayFrequency: "always",
+        delay: "0 seconds",
+        showTime: {
+          start: "00:00",
+          end: "23:59"
+        }
+      },
+      content: {
+        title: "Request Multiple Quotes",
+        description: "Get competitive quotes from multiple professionals. Compare prices and services to find the best match.",
+        primaryButton: {
+          text: "Get Quotes",
+          link: "/get-quotes",
+          style: "primary"
+        },
+        secondaryButton: null,
+        image: "/quotes-icon.png",
+        videoUrl: null
+      },
+      targeting: {
+        audience: "all-visitors",
+        devices: ["all"],
+        locations: ["all"],
+        language: ["all"],
+        userType: ["all"],
+        urlPatterns: ["/*"]
+      },
+      design: {
+        theme: "light",
+        animation: "none",
+        overlay: false,
+        width: "100%",
+        height: "auto",
+        cornerRadius: "0px",
+        colors: {
+          background: "#F3F4F6",
+          text: "#1F2937",
+          primary: "#2563EB",
+          secondary: "#6B7280"
+        },
+        typography: {
+          titleSize: "18px",
+          descriptionSize: "14px",
+          fontFamily: "Inter, sans-serif"
+        },
+        spacing: {
+          padding: "16px",
+          gap: "12px"
+        }
+      },
+      behavior: {
+        closeOnOverlayClick: false,
+        closeOnEscape: false,
+        showCloseButton: false,
+        autoClose: null,
+        scrollBehavior: "allow"
+      },
+      performance: {
+        impressions: 40000,
+        clicks: 5200,
+        dismissals: 0,
+        conversionRate: "13.0%",
+        avgViewTime: "N/A"
+      }
+    },
+    {
+      id: 7,
+      name: "Footer - Reviews",
+      type: "footer",
+      category: "social proof",
+      status: "active",
+      pageLocation: "all",
+      displayLocation: "bottom",
+      timing: {
+        startDate: "2024-01-01",
+        endDate: null,
+        displayFrequency: "always",
+        delay: "0 seconds",
+        showTime: {
+          start: "00:00",
+          end: "23:59"
+        }
+      },
+      content: {
+        title: "Read Client Reviews",
+        description: "See what others are saying about our professionals. Real reviews from real customers.",
+        primaryButton: {
+          text: "View Reviews",
+          link: "/reviews",
+          style: "primary"
+        },
+        secondaryButton: null,
+        image: "/reviews-icon.png",
+        videoUrl: null
+      },
+      targeting: {
+        audience: "all-visitors",
+        devices: ["all"],
+        locations: ["all"],
+        language: ["all"],
+        userType: ["all"],
+        urlPatterns: ["/*"]
+      },
+      design: {
+        theme: "light",
+        animation: "none",
+        overlay: false,
+        width: "100%",
+        height: "auto",
+        cornerRadius: "0px",
+        colors: {
+          background: "#F3F4F6",
+          text: "#1F2937",
+          primary: "#2563EB",
+          secondary: "#6B7280"
+        },
+        typography: {
+          titleSize: "18px",
+          descriptionSize: "14px",
+          fontFamily: "Inter, sans-serif"
+        },
+        spacing: {
+          padding: "16px",
+          gap: "12px"
+        }
+      },
+      behavior: {
+        closeOnOverlayClick: false,
+        closeOnEscape: false,
+        showCloseButton: false,
+        autoClose: null,
+        scrollBehavior: "allow"
+      },
+      performance: {
+        impressions: 39000,
+        clicks: 2800,
+        dismissals: 0,
+        conversionRate: "7.2%",
+        avgViewTime: "N/A"
+      }
+    },
+    {
+      id: 8,
       name: "Terms & Conditions Update",
       type: "legal",
       category: "important",
@@ -189,8 +672,58 @@ const MarketingPopups = () => {
     }
   ];
 
+  // Sample users for notifications and permissions
+  const users = [
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john@example.com",
+      type: "professional",
+      category: "Plumber",
+      status: "active",
+      permissions: {
+        camera: true,
+        notifications: true
+      }
+    },
+    {
+      id: 2,
+      name: "Sarah Wilson",
+      email: "sarah@example.com",
+      type: "professional",
+      category: "Electrician",
+      status: "active",
+      permissions: {
+        camera: true,
+        notifications: true
+      }
+    },
+    {
+      id: 3,
+      name: "Michael Johnson",
+      email: "michael@example.com",
+      type: "customer",
+      status: "active",
+      permissions: {
+        camera: true,
+        notifications: true
+      }
+    },
+    {
+      id: 4,
+      name: "Emma Davis",
+      email: "emma@example.com",
+      type: "customer",
+      status: "active",
+      permissions: {
+        camera: true,
+        notifications: false
+      }
+    }
+  ];
+
   const PopupCard = ({ popup }) => (
-    <Card className="p-4 md:p-6 hover:shadow-md transition-shadow"  style={{ textAlign: 'left' }}>
+    <Card className="p-4 md:p-6 hover:shadow-md transition-shadow" style={{ textAlign: 'left' }}>
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -347,13 +880,278 @@ const MarketingPopups = () => {
     </Card>
   );
 
+  const UserCard = ({ user }) => (
+    <Card className="p-4 md:p-6 hover:shadow-md transition-shadow" style={{ textAlign: 'left' }}>
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">{user.name}</h3>
+            <Badge className={user.type === 'professional' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}>
+              {user.type.charAt(0).toUpperCase() + user.type.slice(1)}
+            </Badge>
+          </div>
+          <p className="text-sm text-gray-600 mt-1">{user.email}</p>
+          {user.category && <p className="text-sm text-gray-600">{user.category}</p>}
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => {
+              setSelectedUser(user);
+              setShowNotificationModal(true);
+            }}
+          >
+            <Bell className="h-4 w-4" />
+            Notify
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => {
+              setSelectedUser(user);
+              setShowPermissionModal(true);
+            }}
+          >
+            <Settings className="h-4 w-4" />
+            Permissions
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-4">
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Camera className="h-4 w-4 text-gray-500" />
+              <span className="text-sm">Camera Access</span>
+            </div>
+            <Badge className={user.permissions.camera ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
+              {user.permissions.camera ? 'Enabled' : 'Disabled'}
+            </Badge>
+          </div>
+        </div>
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-gray-500" />
+              <span className="text-sm">Notifications</span>
+            </div>
+            <Badge className={user.permissions.notifications ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
+              {user.permissions.notifications ? 'Enabled' : 'Disabled'}
+            </Badge>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+
+  const NotificationModal = ({ isOpen, onClose, user }) => {
+    const [notificationType, setNotificationType] = useState('banner');
+    const [notificationTitle, setNotificationTitle] = useState('');
+    const [notificationMessage, setNotificationMessage] = useState('');
+    const [notificationPriority, setNotificationPriority] = useState('normal');
+    const [notificationAction, setNotificationAction] = useState('');
+    const [notificationExpiry, setNotificationExpiry] = useState('');
+
+    if (!isOpen || !user) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ textAlign: 'left' }}>
+        <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b sticky top-0 bg-white z-10">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Send Notification to {user.name}</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notification Type</label>
+                <select 
+                  className="w-full px-3 py-2 border rounded-lg"
+                  value={notificationType}
+                  onChange={(e) => setNotificationType(e.target.value)}
+                >
+                  <option value="banner">Banner</option>
+                  <option value="popup">Popup</option>
+                  <option value="message">In-app Message</option>
+                  <option value="email">Email</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Enter notification title"
+                  value={notificationTitle}
+                  onChange={(e) => setNotificationTitle(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                <textarea
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={4}
+                  placeholder="Enter notification message"
+                  value={notificationMessage}
+                  onChange={(e) => setNotificationMessage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                <select 
+                  className="w-full px-3 py-2 border rounded-lg"
+                  value={notificationPriority}
+                  onChange={(e) => setNotificationPriority(e.target.value)}
+                >
+                  <option value="low">Low</option>
+                  <option value="normal">Normal</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Action URL (Optional)</label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Enter URL for notification action"
+                  value={notificationAction}
+                  onChange={(e) => setNotificationAction(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Expiry (Optional)</label>
+                <input
+                  type="datetime-local"
+                  className="w-full px-3 py-2 border rounded-lg"
+                  value={notificationExpiry}
+                  onChange={(e) => setNotificationExpiry(e.target.value)}
+                />
+              </div>
+
+              <div className="pt-4 border-t flex justify-end gap-3">
+                <Button variant="outline" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button>
+                  Send Notification
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const PermissionModal = ({ isOpen, onClose, user }) => {
+    const [cameraAccess, setCameraAccess] = useState(user?.permissions.camera || false);
+    const [notificationAccess, setNotificationAccess] = useState(user?.permissions.notifications || false);
+    
+    if (!isOpen || !user) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ textAlign: 'left' }}>
+        <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b sticky top-0 bg-white z-10">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Manage Permissions for {user.name}</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="space-y-6">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <p className="text-sm text-blue-700">
+                    Changing permissions will affect this user's ability to interact with certain features of the platform.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Camera className="h-5 w-5 text-gray-700" />
+                    <div>
+                      <p className="font-medium">Camera Access</p>
+                      <p className="text-sm text-gray-500">Allow the user to use video call features</p>
+                    </div>
+                  </div>
+                  <div className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value=""
+                      className="sr-only peer"
+                      checked={cameraAccess}
+                      onChange={() => setCameraAccess(!cameraAccess)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-5 w-5 text-gray-700" />
+                    <div>
+                      <p className="font-medium">Notification Access</p>
+                      <p className="text-sm text-gray-500">Allow the user to receive notifications</p>
+                    </div>
+                  </div>
+                  <div className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value=""
+                      className="sr-only peer"
+                      checked={notificationAccess}
+                      onChange={() => setNotificationAccess(!notificationAccess)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t flex justify-end gap-3">
+                <Button variant="outline" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button>
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const PopupModal = ({ popup = null, isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState('content');
 
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"  style={{ textAlign: 'left' }}>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ textAlign: 'left' }}>
         <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <div className="p-6 border-b sticky top-0 bg-white z-10">
             <div className="flex items-center justify-between">
@@ -436,6 +1234,7 @@ const MarketingPopups = () => {
                         <option value="announcement">Announcement</option>
                         <option value="promotion">Promotion</option>
                         <option value="legal">Legal Notice</option>
+                        <option value="footer">Footer Content</option>
                       </select>
                     </div>
                     <div>
@@ -444,6 +1243,9 @@ const MarketingPopups = () => {
                         <option value="general">General</option>
                         <option value="important">Important</option>
                         <option value="marketing">Marketing</option>
+                        <option value="informational">Informational</option>
+                        <option value="conversion">Conversion</option>
+                        <option value="social proof">Social Proof</option>
                       </select>
                     </div>
                   </div>
@@ -519,6 +1321,9 @@ const MarketingPopups = () => {
                       <select className="mt-1 block w-full px-3 py-2 border rounded-lg">
                         <option value="all">All Pages</option>
                         <option value="homepage">Homepage</option>
+                        <option value="professional">Professional Page</option>
+                        <option value="international-professionals">International Professionals</option>
+                        <option value="internationalhomepage">International Homepage</option>
                         <option value="services">Services Pages</option>
                         <option value="blog">Blog Pages</option>
                       </select>
@@ -812,6 +1617,135 @@ const MarketingPopups = () => {
     );
   };
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'popups':
+        return (
+          <div className="grid grid-cols-1 gap-6">
+            {popups
+              .filter(popup => selectedStatus === 'all' || popup.status === selectedStatus)
+              .filter(popup => selectedType === 'all' || popup.type === selectedType)
+              .filter(popup => popup.name.toLowerCase().includes(searchQuery.toLowerCase()))
+              .map(popup => (
+                <PopupCard key={popup.id} popup={popup} />
+              ))}
+          </div>
+        );
+      
+      case 'notifications':
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {users
+              .filter(user => user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              user.email.toLowerCase().includes(searchQuery.toLowerCase()))
+              .map(user => (
+                <UserCard key={user.id} user={user} />
+              ))}
+          </div>
+        );
+
+      case 'settings':
+        return (
+          <Card className="p-6">
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Global Popup Settings</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Automatic Display Rules</h4>
+                      <p className="text-sm text-gray-500 mt-1">Set default rules for automatic popup display</p>
+                    </div>
+                    <Button variant="outline" size="sm">Configure</Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Maximum Popups Per Session</h4>
+                      <p className="text-sm text-gray-500 mt-1">Set maximum number of popups to show in a single session</p>
+                    </div>
+                    <select className="px-3 py-2 border rounded-lg">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="unlimited">Unlimited</option>
+                    </select>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Default Popup Behavior</h4>
+                      <p className="text-sm text-gray-500 mt-1">Set default behavior for all popups</p>
+                    </div>
+                    <Button variant="outline" size="sm">Configure</Button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="pt-6 border-t">
+                <h3 className="text-lg font-semibold mb-4">Notification Settings</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Default Notification Duration</h4>
+                      <p className="text-sm text-gray-500 mt-1">How long notifications are displayed by default</p>
+                    </div>
+                    <select className="px-3 py-2 border rounded-lg">
+                      <option value="5">5 seconds</option>
+                      <option value="10">10 seconds</option>
+                      <option value="15">15 seconds</option>
+                      <option value="30">30 seconds</option>
+                      <option value="0">Until dismissed</option>
+                    </select>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <h4 className="font-medium">User Permission Controls</h4>
+                      <p className="text-sm text-gray-500 mt-1">Configure user permissions for features</p>
+                    </div>
+                    <Button variant="outline" size="sm">Configure</Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t">
+                <h3 className="text-lg font-semibold mb-4">Performance Tracking</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Analytics Integration</h4>
+                      <p className="text-sm text-gray-500 mt-1">Configure tracking for popups and notifications</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-green-600">Connected</span>
+                      <Button variant="outline" size="sm">Configure</Button>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Conversion Tracking</h4>
+                      <p className="text-sm text-gray-500 mt-1">Track effectiveness of popups and notifications</p>
+                    </div>
+                    <Button variant="outline" size="sm">Configure</Button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t flex justify-end gap-3">
+                <Button variant="outline">Reset to Defaults</Button>
+                <Button>Save Settings</Button>
+              </div>
+            </div>
+          </Card>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
   const renderMainContent = () => {
     return (
       <div className="space-y-6"  style={{ textAlign: 'left' }}>
@@ -866,6 +1800,28 @@ const MarketingPopups = () => {
           </Card>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-2 border-b overflow-x-auto">
+          <TabButton
+            active={activeTab === 'popups'}
+            label="Popups"
+            icon={MessageSquare}
+            onClick={() => setActiveTab('popups')}
+          />
+          <TabButton
+            active={activeTab === 'notifications'}
+            label="User Notifications"
+            icon={Bell}
+            onClick={() => setActiveTab('notifications')}
+          />
+          <TabButton
+            active={activeTab === 'settings'}
+            label="Settings"
+            icon={Settings}
+            onClick={() => setActiveTab('settings')}
+          />
+        </div>
+
         {/* Search and Filters */}
         <Card className="p-4">
           <div className="flex flex-col sm:flex-row justify-between gap-4">
@@ -874,7 +1830,7 @@ const MarketingPopups = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search popups..."
+                  placeholder={activeTab === 'popups' ? "Search popups..." : "Search users..."}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border rounded-lg"
@@ -885,41 +1841,37 @@ const MarketingPopups = () => {
                 Filters
               </Button>
             </div>
-            <div className="flex gap-2">
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-4 py-2 border rounded-lg"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="scheduled">Scheduled</option>
-                <option value="inactive">Inactive</option>
-              </select>
-              <select
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="px-4 py-2 border rounded-lg"
-              >
-                <option value="all">All Types</option>
-                <option value="welcome">Welcome</option>
-                <option value="announcement">Announcement</option>
-                <option value="promotion">Promotion</option>
-                <option value="legal">Legal</option>
-              </select>
-            </div>
+            {activeTab === 'popups' && (
+              <div className="flex gap-2">
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="px-4 py-2 border rounded-lg"
+                >
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="px-4 py-2 border rounded-lg"
+                >
+                  <option value="all">All Types</option>
+                  <option value="welcome">Welcome</option>
+                  <option value="announcement">Announcement</option>
+                  <option value="promotion">Promotion</option>
+                  <option value="legal">Legal</option>
+                  <option value="footer">Footer</option>
+                </select>
+              </div>
+            )}
           </div>
         </Card>
 
-        {/* Popups List */}
-        <div className="grid grid-cols-1 gap-6">
-          {popups
-            .filter(popup => selectedStatus === 'all' || popup.status === selectedStatus)
-            .filter(popup => selectedType === 'all' || popup.type === selectedType)
-            .map(popup => (
-              <PopupCard key={popup.id} popup={popup} />
-            ))}
-        </div>
+        {/* Tab Content */}
+        {renderTabContent()}
       </div>
     );
   };
@@ -935,15 +1887,29 @@ const MarketingPopups = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Marketing Popups</h1>
-                <p className="text-gray-600 mt-1">Manage promotional popups and banners across the platform</p>
+                <p className="text-gray-600 mt-1">Manage promotional popups and notifications across the platform</p>
               </div>
-              <Button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Create Popup
-              </Button>
+              {activeTab === 'popups' && (
+                <Button
+                  onClick={() => setShowAddModal(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Create Popup
+                </Button>
+              )}
+              {activeTab === 'notifications' && (
+                <Button
+                  className="flex items-center gap-2"
+                  onClick={() => {
+                    setSelectedUser(users[0]);
+                    setShowNotificationModal(true);
+                  }}
+                >
+                  <Bell className="h-4 w-4" />
+                  New Notification
+                </Button>
+              )}
             </div>
 
             {/* Main Content */}
@@ -963,6 +1929,24 @@ const MarketingPopups = () => {
                 popup={selectedPopup}
                 isOpen={true}
                 onClose={() => setSelectedPopup(null)}
+              />
+            )}
+
+            {/* Notification Modal */}
+            {showNotificationModal && selectedUser && (
+              <NotificationModal
+                isOpen={true}
+                onClose={() => setShowNotificationModal(false)}
+                user={selectedUser}
+              />
+            )}
+
+            {/* Permission Modal */}
+            {showPermissionModal && selectedUser && (
+              <PermissionModal
+                isOpen={true}
+                onClose={() => setShowPermissionModal(false)}
+                user={selectedUser}
               />
             )}
           </div>
