@@ -1,0 +1,111 @@
+.App {
+  text-align: center;
+}
+
+/* HeroSection.module.css */
+.hero-container {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* Make the container fill the viewport */
+  overflow: hidden; /* Ensure images don't overflow out of the section */
+}
+
+.random-move {
+  position: absolute;
+  animation: moveRandom 12s ease-in-out infinite, fadeInOut 12s ease-in-out infinite;
+  transition: transform 2s ease, opacity 2s ease;
+  opacity: 0; /* Initially hidden */
+  will-change: transform, opacity;
+  border-radius: 8px; /* Optional: round corners for a cleaner look */
+}
+
+/* Define the keyframes for the random movement */
+@keyframes moveRandom {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(30px, 20px);
+  }
+  50% {
+    transform: translate(-40px, 30px);
+  }
+  75% {
+    transform: translate(20px, -15px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Define the keyframes for fading in and out */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Apply delay to individual images to stagger the animations */
+.random-move:nth-child(1) {
+  animation-delay: 0s;
+}
+.random-move:nth-child(2) {
+  animation-delay: 3s;
+}
+.random-move:nth-child(3) {
+  animation-delay: 6s;
+}
+.random-move:nth-child(4) {
+  animation-delay: 9s;
+}
+
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
