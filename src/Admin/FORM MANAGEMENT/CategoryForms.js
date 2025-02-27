@@ -4,8 +4,8 @@ import {
   Search, Filter, FileText, Calendar, CheckSquare,
   Save, Copy, ArrowUp, ArrowDown, Building2,
   Globe, Link, AlertCircle, Users, CheckCircle,
-  ExternalLink, Grid, LayoutGrid, Star, Gift,
-  UserPlus, RefreshCw, Upload, Download, Share2, X
+  RefreshCw, Upload, Download, Share2, X, Gift,
+  UserPlus, Bell, Camera, Star
 } from 'lucide-react';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/Button';
@@ -44,6 +44,48 @@ const CategoryForms = () => {
     status: 'all',
     region: 'all'
   });
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // Mock users for notifications and permissions
+  const users = [
+    {
+      id: 1,
+      name: "John Smith",
+      email: "john@example.com",
+      type: "professional",
+      category: "Plumber",
+      status: "active",
+      permissions: {
+        camera: true,
+        notifications: true
+      }
+    },
+    {
+      id: 2,
+      name: "Sarah Wilson",
+      email: "sarah@example.com",
+      type: "professional",
+      category: "Electrician",
+      status: "active",
+      permissions: {
+        camera: true,
+        notifications: false
+      }
+    },
+    {
+      id: 3,
+      name: "Michael Johnson",
+      email: "michael@example.com",
+      type: "customer",
+      status: "active",
+      permissions: {
+        camera: true,
+        notifications: true
+      }
+    }
+  ];
 
   const forms = [
     {
@@ -98,6 +140,201 @@ const CategoryForms = () => {
       stats: { submissions: 95, conversionRate: "65%", avgResponseTime: "4.5 hours", purchasedCount: 62, hiredCount: 35 }
     }
   ];
+
+  // Notification Modal
+  const NotificationModal = ({ isOpen, onClose, user }) => {
+    const [notificationType, setNotificationType] = useState('banner');
+    const [notificationTitle, setNotificationTitle] = useState('');
+    const [notificationMessage, setNotificationMessage] = useState('');
+    const [notificationPriority, setNotificationPriority] = useState('normal');
+    const [notificationAction, setNotificationAction] = useState('');
+    const [notificationExpiry, setNotificationExpiry] = useState('');
+
+    if (!isOpen || !user) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4" style={{ textAlign: 'left' }}>
+        <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg sm:text-xl font-semibold">Send Notification to {user.name}</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Notification Type</label>
+              <select 
+                className="w-full px-3 py-2 border rounded-lg"
+                value={notificationType}
+                onChange={(e) => setNotificationType(e.target.value)}
+              >
+                <option value="banner">Banner</option>
+                <option value="popup">Popup</option>
+                <option value="message">In-app Message</option>
+                <option value="email">Email</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="Enter notification title"
+                value={notificationTitle}
+                onChange={(e) => setNotificationTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+              <textarea
+                className="w-full px-3 py-2 border rounded-lg"
+                rows={4}
+                placeholder="Enter notification message"
+                value={notificationMessage}
+                onChange={(e) => setNotificationMessage(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+              <select 
+                className="w-full px-3 py-2 border rounded-lg"
+                value={notificationPriority}
+                onChange={(e) => setNotificationPriority(e.target.value)}
+              >
+                <option value="low">Low</option>
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Action URL (Optional)</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="Enter URL for notification action"
+                value={notificationAction}
+                onChange={(e) => setNotificationAction(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Expiry (Optional)</label>
+              <input
+                type="datetime-local"
+                className="w-full px-3 py-2 border rounded-lg"
+                value={notificationExpiry}
+                onChange={(e) => setNotificationExpiry(e.target.value)}
+              />
+            </div>
+
+            <div className="pt-4 border-t flex justify-end gap-3">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button>
+                Send Notification
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Permission Modal
+  const PermissionModal = ({ isOpen, onClose, user }) => {
+    const [cameraAccess, setCameraAccess] = useState(user?.permissions.camera || false);
+    const [notificationAccess, setNotificationAccess] = useState(user?.permissions.notifications || false);
+    
+    if (!isOpen || !user) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4" style={{ textAlign: 'left' }}>
+        <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg sm:text-xl font-semibold">Manage Permissions for {user.name}</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-6 space-y-4">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                <p className="text-sm text-blue-700">
+                  Changing permissions will affect this user's ability to interact with certain features of the platform.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Camera className="h-5 w-5 text-gray-700" />
+                  <div>
+                    <p className="font-medium">Camera Access</p>
+                    <p className="text-sm text-gray-500">Allow the user to use video call features</p>
+                  </div>
+                </div>
+                <div className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    value=""
+                    className="sr-only peer"
+                    checked={cameraAccess}
+                    onChange={() => setCameraAccess(!cameraAccess)}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Bell className="h-5 w-5 text-gray-700" />
+                  <div>
+                    <p className="font-medium">Notification Access</p>
+                    <p className="text-sm text-gray-500">Allow the user to receive notifications</p>
+                  </div>
+                </div>
+                <div className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    value=""
+                    className="sr-only peer"
+                    checked={notificationAccess}
+                    onChange={() => setNotificationAccess(!notificationAccess)}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t flex justify-end gap-3">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const FormEditorModal = ({ isOpen, onClose, form }) => {
     const [formData, setFormData] = useState(form ? { ...form } : {});
@@ -344,8 +581,7 @@ const CategoryForms = () => {
                       <div className="mt-1 relative">
                         <input
                           type="text"
-                          className="w-full pr-6 pl-3 py-1 sm:pr-8 sm:pl-4 sm:py-2 border rounded-lg text-sm"
-                          value={formData.pricing.commission.emergency.replace('%', '')}
+                          className="w-full pr-6 pl-3 py-1 sm:pr-8 sm:pl-4 sm:py-2 border rounded-lg text-sm"value={formData.pricing.commission.emergency.replace('%', '')}
                           onChange={(e) => updatePricing('commission', 'emergency', `${e.target.value}%`)}
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
@@ -354,7 +590,7 @@ const CategoryForms = () => {
                   </div>
                 </div>
                 <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
-                  <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="flex items-start gap-3">
                     <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 mt-0.5" />
                     <div>
                       <p className="text-xs sm:text-sm text-blue-700">
@@ -487,6 +723,75 @@ const CategoryForms = () => {
     { id: 'au', name: 'Australia', active: false }
   ];
 
+  // User Card Component for User Management Tab
+  const UserCard = ({ user }) => (
+    <Card className="p-4 sm:p-6 hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">{user.name}</h3>
+            <Badge className={user.type === 'professional' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}>
+              {user.type.charAt(0).toUpperCase() + user.type.slice(1)}
+            </Badge>
+          </div>
+          <p className="text-sm text-gray-600 mt-1">{user.email}</p>
+          {user.category && <p className="text-sm text-gray-600">{user.category}</p>}
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => {
+              setSelectedUser(user);
+              setShowNotificationModal(true);
+            }}
+          >
+            <Bell className="h-4 w-4" />
+            Notify
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="flex items-center gap-2"
+            onClick={() => {
+              setSelectedUser(user);
+              setShowPermissionModal(true);
+            }}
+          >
+            <Settings className="h-4 w-4" />
+            Permissions
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-4">
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Camera className="h-4 w-4 text-gray-500" />
+              <span className="text-sm">Camera Access</span>
+            </div>
+            <Badge className={user.permissions.camera ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
+              {user.permissions.camera ? 'Enabled' : 'Disabled'}
+            </Badge>
+          </div>
+        </div>
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-gray-500" />
+              <span className="text-sm">Notifications</span>
+            </div>
+            <Badge className={user.permissions.notifications ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
+              {user.permissions.notifications ? 'Enabled' : 'Disabled'}
+            </Badge>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+
   const FormCard = ({ form }) => (
     <Card className="p-4 sm:p-6 hover:shadow-md transition-shadow">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
@@ -512,13 +817,25 @@ const CategoryForms = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={() => { setSelectedForm(form); setShowFormEditor(true); }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => { setSelectedForm(form); setShowFormEditor(true); }}
+          >
             <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => setSelectedForm(form)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedForm(form)}
+          >
             <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="text-red-600">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-red-600"
+          >
             <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
@@ -774,6 +1091,34 @@ const CategoryForms = () => {
     );
   };
 
+  // User Management Section
+  const UserManagementSection = () => (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+        <h3 className="text-lg font-medium">User Permissions</h3>
+        <div className="mt-2 sm:mt-0">
+          <Button 
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={() => {
+              setSelectedUser(users[0]);
+              setShowNotificationModal(true);
+            }}
+          >
+            <Bell className="h-4 w-4" />
+            Send Notification
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {users.map(user => (
+          <UserCard key={user.id} user={user} />
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50" style={{ textAlign: 'left' }}>
       <AdminHeader />
@@ -813,7 +1158,7 @@ const CategoryForms = () => {
                     <p className="text-xs sm:text-sm text-gray-500">Categories</p>
                     <p className="text-lg sm:text-2xl font-semibold mt-1">8</p>
                   </div>
-                  <div className="p-2 bg-green-100 rounded-lg"><Grid className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" /></div>
+                  <div className="p-2 bg-green-100 rounded-lg"><Filter className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" /></div>
                 </div>
               </Card>
               <Card className="p-4 sm:p-6">
@@ -837,9 +1182,10 @@ const CategoryForms = () => {
             </div>
             <div className="flex gap-2 border-b overflow-x-auto snap-x pb-2">
               <TabButton active={activeTab === 'forms'} label="Forms" icon={FormInput} onClick={() => setActiveTab('forms')} />
-              <TabButton active={activeTab === 'categories'} label="Categories" icon={Grid} onClick={() => setActiveTab('categories')} />
+              <TabButton active={activeTab === 'categories'} label="Categories" icon={Filter} onClick={() => setActiveTab('categories')} />
               <TabButton active={activeTab === 'promotions'} label="Promotions" icon={Gift} onClick={() => setActiveTab('promotions')} />
               <TabButton active={activeTab === 'settings'} label="Settings" icon={Settings} onClick={() => setActiveTab('settings')} />
+              <TabButton active={activeTab === 'users'} label="User Permissions" icon={Users} onClick={() => setActiveTab('users')} />
             </div>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4">
@@ -911,6 +1257,9 @@ const CategoryForms = () => {
                   </div>
                 </>
               )}
+              {activeTab === 'users' && (
+                <UserManagementSection />
+              )}
               {activeTab === 'promotions' && (
                 <Card className="p-4 sm:p-6">
                   <h2 className="text-lg sm:text-xl font-semibold mb-4">Form Promotion Settings</h2>
@@ -969,7 +1318,7 @@ const CategoryForms = () => {
                           <div key={category.id} className="p-2 sm:p-3 bg-gray-50 rounded-lg">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                               <div className="flex items-center gap-2">
-                                <Grid className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+                                <Filter className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                                 <span className="font-medium text-xs sm:text-sm">{category.name}</span>
                               </div>
                               <div className="flex items-center gap-2 sm:gap-3">
@@ -1174,7 +1523,7 @@ const CategoryForms = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <label className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded" defaultChecked />
+                        <input type="checkbox" className="rounded" defaultChecked /><input type="checkbox" className="rounded" defaultChecked />
                         <span className="text-xs sm:text-sm">Required Field</span>
                       </label>
                       <Button variant="ghost" size="sm" className="text-red-600">
@@ -1314,6 +1663,20 @@ const CategoryForms = () => {
           isOpen={showPromotionModal}
           onClose={() => setShowPromotionModal(false)}
           form={selectedForm}
+        />
+      )}
+      {showNotificationModal && selectedUser && (
+        <NotificationModal
+          isOpen={showNotificationModal}
+          onClose={() => setShowNotificationModal(false)}
+          user={selectedUser}
+        />
+      )}
+      {showPermissionModal && selectedUser && (
+        <PermissionModal
+          isOpen={showPermissionModal}
+          onClose={() => setShowPermissionModal(false)}
+          user={selectedUser}
         />
       )}
     </div>
