@@ -8,10 +8,9 @@ import {
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/Button';
-import SharedHeader from '../../Headers/SharedHeader2';
 import SharedHeader2 from '../../Headers/SharedHeader2';
 import SharedFooter from '../../Footer/SharedFooter';
-
+import { useNavigate } from 'react-router-dom'; // Added for navigation
 
 const LocalProfessionalsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,6 +22,8 @@ const LocalProfessionalsPage = () => {
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('Toronto, ON');
 
+  const navigate = useNavigate(); // Hook for navigation
+
   // Same data as before...
   const locations = [
     'Toronto, ON',
@@ -32,7 +33,6 @@ const LocalProfessionalsPage = () => {
     'Ottawa, ON'
   ];
 
-  // Mock professionals data (same as before)...
   // Mock professionals data
   const professionals = [
     {
@@ -66,7 +66,7 @@ const LocalProfessionalsPage = () => {
       verified: true,
       insured: true,
       languages: ['English']
-    },
+    }
     // Add more professionals as needed
   ];
 
@@ -310,9 +310,9 @@ const LocalProfessionalsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50" >
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <SharedHeader2/>
+      <SharedHeader2 navigateBack={() => navigate(-1)} /> {/* Updated to handle back navigation */}
   
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8" style={{ textAlign: 'left' }}>
@@ -392,7 +392,7 @@ const LocalProfessionalsPage = () => {
           </div>
   
           {/* Search Button */}
-          <div className="flex justify-center" >
+          <div className="flex justify-center">
             <Button 
               className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors w-full md:w-auto"
               onClick={() => {
@@ -534,13 +534,10 @@ const LocalProfessionalsPage = () => {
           </div>
         </div>
       </main>
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
+      <br /><br /><br /><br />
   
       {/* Footer */}
-      <SharedFooter/>
+      <SharedFooter />
     </div>
   );
 };

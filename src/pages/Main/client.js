@@ -60,20 +60,20 @@ const ClientDashboard = () => {
   const sidebarItems = [
     { icon: <Home className="h-5 w-5" />, label: "Dashboard", path: "/clients" },
     { icon: <FileText className="h-5 w-5" />, label: "Find your local professionals", path: "/local-professionals" },
-    { icon: <FileText className="h-5 w-5" />, label: "Finds your international professionals", path: "/professional-international" },
+    { icon: <FileText className="h-5 w-5" />, label: "Find your international professionals", path: "/international-professionals" },
     { icon: <FileText className="h-5 w-5" />, label: "Post a Job: Quote or Hire Local", path: "/" },
-    { icon: <FileText className="h-5 w-5" />, label: "Post a Job: Quote or Hire International", path: "/internationalhompage" },
+    { icon: <FileText className="h-5 w-5" />, label: "Post a Job: Quote or Hire International", path: "/internationalhomepage" },
     { icon: <User2 className="h-5 w-5" />, label: "My Profile", path: "/client/profile" },
     { icon: <User className="h-5 w-5" />, label: "Profile Settings", path: "/client/profilesettings" },
     { icon: <Settings2 className="h-5 w-5" />, label: "My Settings", path: "/client/settings" },
-    { icon: <ChartAreaIcon className="h-5 w-5" />, label: "Progress", path: "/client/progress" },
+    { icon: <ChartAreaIcon className="h-5 w-5" />, label: "Progress", path: "/client/progress" }, // Already present, verified
     { icon: <MessageCircle className="h-5 w-5" />, label: "Message or Video Call", path: "/client/MessageAndVideoCall" },
     { icon: <FileCheck className="h-5 w-5" />, label: "My Orders", path: "/client/myorders" },
     { icon: <MdReviews className="h-5 w-5" />, label: "Reviews", path: "/client/reviews" },
     { icon: <Bell className="h-5 w-5" />, label: "My Offers", path: "/client/myoffers" },
     { icon: <Wallet className="h-5 w-5" />, label: "Wallet", path: "/client/Wallet" },
     { icon: <Shield className="h-5 w-5" />, label: "Support tickets", path: "/client/support" },
-    { icon: <LogOut className="h-5 w-5" />, label: "Log Out", path: "/logoin" }
+    { icon: <LogOut className="h-5 w-5" />, label: "Log Out", path: "/logout" } // Corrected path from '/logoin' to '/logout'
   ];
 
   const stats = [
@@ -211,7 +211,7 @@ const ClientDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50"  style={{ textAlign: 'left' }}>
+    <div className="min-h-screen bg-gray-50" style={{ textAlign: 'left' }}>
       {/* Fixed Header */}
       <div className="fixed top-0 inset-x-0 z-50 bg-white border-b h-16">
         <SharedHeader5 />
@@ -297,7 +297,7 @@ const ClientDashboard = () => {
         </AnimatePresence>
 
         {/* Main Content */}
-        <div className="flex-1 lg:pl-64"  style={{ textAlign: 'left' }} >
+        <div className="flex-1 lg:pl-64" style={{ textAlign: 'left' }}>
           <main className="p-4 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-8">
               {/* Welcome Section */}
@@ -429,13 +429,13 @@ const ClientDashboard = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Button */}
-      {/* <button 
-        onClick={() => setIsMobileMenuOpen(true)}
-        className="fixed bottom-6 right-6 lg:hidden z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-      >
-        <Menu className="h-6 w-6" />
-      </button> */}
+      {/* Modals */}
+      <PolicyModals 
+        showPrivacyModal={showPrivacyModal}
+        showTermsModal={showTermsModal}
+        onClosePrivacy={() => setShowPrivacyModal(false)}
+        onCloseTerms={() => setShowTermsModal(false)}
+      />
     </div>
   );
 };

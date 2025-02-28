@@ -4,7 +4,8 @@ import {
   Filter, Search, Clock, CheckCircle, XCircle,
   MessageCircle, Calendar, ChevronDown, FileText,
   AlertCircle, X, Send, Flag, Paperclip, Plus,
-  RefreshCcw, MoreVertical, ArrowUpRight, MessageSquare
+  RefreshCcw, MoreVertical, ArrowUpRight, MessageSquare,
+  Home, User, Settings, Shield, ChartAreaIcon, Menu
 } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import SharedHeader4 from '../Headers/SharedHeader4';
@@ -20,6 +21,18 @@ const SupportTickets = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [newMessage, setNewMessage] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Sidebar items (added for professional support view)
+  const sidebarItems = [
+    { icon: <Home className="h-5 w-5" />, label: "Dashboard", href: "/professionals" },
+    { icon: <MessageCircle className="h-5 w-5" />, label: "Messages", href: "/MessageAndVideoCall" },
+    { icon: <FileText className="h-5 w-5" />, label: "My Orders", href: "/myorders" },
+    { icon: <ChartAreaIcon className="h-5 w-5" />, label: "Progress", href: "/Progress" }, // Added as per request
+    { icon: <Shield className="h-5 w-5" />, label: "Support Tickets", href: "/support", active: true },
+    { icon: <User className="h-5 w-5" />, label: "My Profile", href: "/myprofile" },
+    { icon: <Settings className="h-5 w-5" />, label: "Settings", href: "/Settings" }
+  ];
 
   // Mock data for tickets
   const tickets = [
@@ -169,7 +182,7 @@ const SupportTickets = () => {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-hidden flex"  style={{ textAlign: 'left' }}>
+          <div className="flex-1 overflow-hidden flex" style={{ textAlign: 'left' }}>
             {/* Main Chat Area */}
             <div className="flex-1 flex flex-col min-w-0">
               {/* Messages */}
@@ -336,287 +349,364 @@ const SupportTickets = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50"  style={{ textAlign: 'left' }}>
-      <SharedHeader4 />
-      
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Support Tickets</h1>
-          <p className="text-gray-600 mt-1">Manage and respond to support requests</p>
-        </div>
+    <div className="min-h-screen bg-gray-50" style={{ textAlign: 'left' }}>
+      {/* Fixed Header */}
+      <div className="fixed top-0 inset-x-0 z-50 bg-white border-b h-16">
+        <SharedHeader4 />
+      </div>
 
-        {/* Ticket Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <MessageSquare className="h-5 w-5 text-blue-600" />
-              </div>
-              <span className="text-sm text-gray-500">Total Tickets</span>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-2xl font-bold text-gray-900">126</h3>
-              <p className="text-sm text-gray-600">All tickets</p>
-            </div>
-          </Card>
+      <div className="flex min-h-[calc(100vh-64px)] pt-16">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:block fixed left-0 top-16 bottom-0 w-64 bg-white border-r shadow-sm overflow-y-auto">
+          <nav className="p-4 space-y-1">
+            {sidebarItems.map((item, index) => (
+              <a
+                key={index}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
+                  item.active
+                    ? 'text-blue-600 bg-blue-50 font-medium'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </a>
+            ))}
+          </nav>
+        </aside>
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Clock className="h-5 w-5 text-green-600" />
-              </div>
-              <span className="text-sm text-gray-500">Open</span>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-2xl font-bold text-gray-900">28</h3>
-              <p className="text-sm text-gray-600">Active tickets</p>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Flag className="h-5 w-5 text-yellow-600" />
-              </div>
-              <span className="text-sm text-gray-500">High Priority</span>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-2xl font-bold text-gray-900">8</h3>
-              <p className="text-sm text-gray-600">Need attention</p>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <CheckCircle className="h-5 w-5 text-purple-600" />
-              </div>
-              <span className="text-sm text-gray-500">Resolved</span>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-2xl font-bold text-gray-900">90</h3>
-              <p className="text-sm text-gray-600">This month</p>
-            </div>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="flex flex-wrap gap-4 mb-8">
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            <Plus className="h-5 w-5" />
-            Create Ticket
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 border text-gray-700 rounded-lg hover:bg-gray-50">
-            <RefreshCcw className="h-5 w-5" />
-            Refresh List
-          </button>
-        </div>
-
-        {/* Filters and Search */}
-        <Card className="mb-8">
-          <div className="p-4 border-b">
-            <div className="flex flex-col sm:flex-row justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="relative flex-1 sm:flex-none sm:min-w-[300px]">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search tickets..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg"
-                  />
-                </div>
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
-                >
-                  <Filter className="h-5 w-5" />
-                  <span>Filters</span>
-                </button>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-2 border rounded-lg"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="priority">Priority</option>
-                  <option value="updated">Last Updated</option>
-                </select>
-              </div>
-            </div>
-
-            <AnimatePresence>
-              {showFilters && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="mt-4 pt-4 border-t"
-                >
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Status
-                      </label>
-                      <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg"
-                      >
-                        <option value="all">All Status</option>
-                        <option value="open">Open</option>
-                        <option value="pending">Pending</option>
-                        <option value="resolved">Resolved</option>
-                        <option value="closed">Closed</option>
-                      </select>
+        {/* Mobile Sidebar */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+              />
+              <motion.aside
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                className="fixed inset-y-0 left-0 w-full max-w-xs bg-white shadow-xl z-50 lg:hidden overflow-y-auto"
+              >
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <img src="https://assests.netlify.app/assets/images/logo.png" alt="Logo" className="h-8 w-8" />
+                      <span className="text-blue-600 text-lg font-bold">Kokobeo</span>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Priority
-                      </label>
-                      <select
-                        className="w-full px-4 py-2 border rounded-lg"
-                      >
-                        <option value="all">All Priority</option>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Category
-                      </label>
-                      <select
-                        className="w-full px-4 py-2 border rounded-lg"
-                      >
-                        <option value="all">All Categories</option>
-                        <option value="account">Account</option>
-                        <option value="billing">Billing</option>
-                        <option value="technical">Technical</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Date Range
-                      </label>
-                      <select
-                        value={dateRange}
-                        onChange={(e) => setDateRange(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg"
-                      >
-                        <option value="all">All Time</option>
-                        <option value="today">Today</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end mt-4">
                     <button
-                      onClick={() => {
-                        setDateRange('all');
-                        setStatusFilter('all');
-                        setShowFilters(false);
-                      }}
-                      className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
                     >
-                      Reset Filters
+                      <X className="h-6 w-6" />
                     </button>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Tickets List */}
-          <div className="divide-y">
-            {tickets.map((ticket) => (
-              <div
-                key={ticket.id}
-                className="p-6 hover:bg-gray-50 transition-colors cursor-pointer"
-                onClick={() => setSelectedTicket(ticket)}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                      {ticket.user.avatar}
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {ticket.subject}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {ticket.user.name} • #{ticket.id}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <StatusBadge status={ticket.status} />
-                    <PriorityBadge priority={ticket.priority} />
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="h-4 w-4" />
-                    {ticket.messages.length} messages
-                  </div>
-                  <div>
-                    <span className="font-medium">Category:</span> {ticket.category}
-                  </div>
-                  <div>
-                    <span className="font-medium">Assigned to:</span> {ticket.assignedTo}
-                  </div>
-                  <div>
-                    <span className="font-medium">Last updated:</span> {new Date(ticket.lastUpdated).toLocaleDateString()}
-                  </div>
-                </div>
-
-                {ticket.tags.length > 0 && (
-                  <div className="flex items-center gap-2 mt-4">
-                    {ticket.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"
+                  <nav className="space-y-1">
+                    {sidebarItems.map((item, index) => (
+                      <a
+                        key={index}
+                        href={item.href}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
+                          item.active
+                            ? 'text-blue-600 bg-blue-50 font-medium'
+                            : 'text-gray-600 hover:bg-gray-50'
+                        }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        {tag}
-                      </span>
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </a>
                     ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Ticket Details Modal */}
-        <AnimatePresence>
-          {selectedTicket && (
-            <TicketDetailsModal
-              ticket={selectedTicket}
-              onClose={() => setSelectedTicket(null)}
-            />
+                  </nav>
+                </div>
+              </motion.aside>
+            </>
           )}
         </AnimatePresence>
-      </main>
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
 
-      {/* Footer Actions - Mobile Only */}
-      <SharedFooter2/>
+        {/* Main Content */}
+        <main className="flex-1 lg:pl-72 px-6 py-8 max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-gray-900">Support Tickets</h1>
+            <p className="text-gray-600 mt-1">Manage and respond to support requests</p>
+          </div>
+
+          {/* Ticket Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <MessageSquare className="h-5 w-5 text-blue-600" />
+                </div>
+                <span className="text-sm text-gray-500">Total Tickets</span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-2xl font-bold text-gray-900">126</h3>
+                <p className="text-sm text-gray-600">All tickets</p>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Clock className="h-5 w-5 text-green-600" />
+                </div>
+                <span className="text-sm text-gray-500">Open</span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-2xl font-bold text-gray-900">28</h3>
+                <p className="text-sm text-gray-600">Active tickets</p>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <Flag className="h-5 w-5 text-yellow-600" />
+                </div>
+                <span className="text-sm text-gray-500">High Priority</span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-2xl font-bold text-gray-900">8</h3>
+                <p className="text-sm text-gray-600">Need attention</p>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-purple-600" />
+                </div>
+                <span className="text-sm text-gray-500">Resolved</span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-2xl font-bold text-gray-900">90</h3>
+                <p className="text-sm text-gray-600">This month</p>
+              </div>
+            </Card>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex flex-wrap gap-4 mb-8">
+            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <Plus className="h-5 w-5" />
+              Create Ticket
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2 border text-gray-700 rounded-lg hover:bg-gray-50">
+              <RefreshCcw className="h-5 w-5" />
+              Refresh List
+            </button>
+          </div>
+
+          {/* Filters and Search */}
+          <Card className="mb-8">
+            <div className="p-4 border-b">
+              <div className="flex flex-col sm:flex-row justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative flex-1 sm:flex-none sm:min-w-[300px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search tickets..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border rounded-lg"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  >
+                    <Filter className="h-5 w-5" />
+                    <span>Filters</span>
+                  </button>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-4 py-2 border rounded-lg"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="priority">Priority</option>
+                    <option value="updated">Last Updated</option>
+                  </select>
+                </div>
+              </div>
+
+              <AnimatePresence>
+                {showFilters && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="mt-4 pt-4 border-t"
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Status
+                        </label>
+                        <select
+                          value={statusFilter}
+                          onChange={(e) => setStatusFilter(e.target.value)}
+                          className="w-full px-4 py-2 border rounded-lg"
+                        >
+                          <option value="all">All Status</option>
+                          <option value="open">Open</option>
+                          <option value="pending">Pending</option>
+                          <option value="resolved">Resolved</option>
+                          <option value="closed">Closed</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Priority
+                        </label>
+                        <select
+                          className="w-full px-4 py-2 border rounded-lg"
+                        >
+                          <option value="all">All Priority</option>
+                          <option value="high">High</option>
+                          <option value="medium">Medium</option>
+                          <option value="low">Low</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Category
+                        </label>
+                        <select
+                          className="w-full px-4 py-2 border rounded-lg"
+                        >
+                          <option value="all">All Categories</option>
+                          <option value="account">Account</option>
+                          <option value="billing">Billing</option>
+                          <option value="technical">Technical</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Date Range
+                        </label>
+                        <select
+                          value={dateRange}
+                          onChange={(e) => setDateRange(e.target.value)}
+                          className="w-full px-4 py-2 border rounded-lg"
+                        >
+                          <option value="all">All Time</option>
+                          <option value="today">Today</option>
+                          <option value="week">This Week</option>
+                          <option value="month">This Month</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end mt-4">
+                      <button
+                        onClick={() => {
+                          setDateRange('all');
+                          setStatusFilter('all');
+                          setShowFilters(false);
+                        }}
+                        className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                      >
+                        Reset Filters
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Tickets List */}
+            <div className="divide-y">
+              {tickets.map((ticket) => (
+                <div
+                  key={ticket.id}
+                  className="p-6 hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => setSelectedTicket(ticket)}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                        {ticket.user.avatar}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900">
+                          {ticket.subject}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {ticket.user.name} • #{ticket.id}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <StatusBadge status={ticket.status} />
+                      <PriorityBadge priority={ticket.priority} />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4" />
+                      {ticket.messages.length} messages
+                    </div>
+                    <div>
+                      <span className="font-medium">Category:</span> {ticket.category}
+                    </div>
+                    <div>
+                      <span className="font-medium">Assigned to:</span> {ticket.assignedTo}
+                    </div>
+                    <div>
+                      <span className="font-medium">Last updated:</span> {new Date(ticket.lastUpdated).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {ticket.tags.length > 0 && (
+                    <div className="flex items-center gap-2 mt-4">
+                      {ticket.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Ticket Details Modal */}
+          <AnimatePresence>
+            {selectedTicket && (
+              <TicketDetailsModal
+                ticket={selectedTicket}
+                onClose={() => setSelectedTicket(null)}
+              />
+            )}
+          </AnimatePresence>
+        </main>
+      </div>
+
+      <br /><br /><br /><br />
+
+      <SharedFooter2 />
     </div>
   );
 };

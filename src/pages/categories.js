@@ -10,13 +10,39 @@ import SharedHeader11 from '../Headers/SharedHeader11';
 
 const locations = {
   canada: {
-    provinces: ["Ontario", "Quebec", "British Columbia", "Alberta"],
+    provinces: [
+      "Alberta",
+      "British Columbia",
+      "Manitoba",
+      "New Brunswick",
+      "Newfoundland and Labrador",
+      "Northwest Territories",
+      "Nova Scotia",
+      "Nunavut",
+      "Ontario",
+      "Prince Edward Island",
+      "Quebec",
+      "Saskatchewan",
+      "Yukon"
+    ],
     cities: {
+      alberta: ["Calgary", "Edmonton", "Red Deer", "Lethbridge"],
+      "british columbia": ["Vancouver", "Victoria", "Surrey", "Kelowna"],
+      manitoba: ["Winnipeg", "Brandon", "Steinbach", "Thompson"],
+      "new brunswick": ["Fredericton", "Moncton", "Saint John", "Bathurst"],
+      "newfoundland and labrador": ["St. John's", "Corner Brook", "Grand Falls-Windsor", "Gander"],
+      "northwest territories": ["Yellowknife", "Inuvik", "Hay River", "Fort Smith"],
+      "nova scotia": ["Halifax", "Sydney", "Truro", "Dartmouth"],
+      nunavut: ["Iqaluit", "Rankin Inlet", "Arviat", "Baker Lake"],
       ontario: ["Toronto", "Ottawa", "Hamilton", "London"],
+      "prince edward island": ["Charlottetown", "Summerside", "Stratford", "Cornwall"],
       quebec: ["Montreal", "Quebec City", "Laval", "Gatineau"],
-      "british columbia": ["Vancouver", "Victoria", "Surrey", "Burnaby"],
-      alberta: ["Calgary", "Edmonton", "Red Deer", "Lethbridge"]
+      saskatchewan: ["Saskatoon", "Regina", "Prince Albert", "Moose Jaw"],
+      yukon: ["Whitehorse", "Dawson City", "Watson Lake", "Haines Junction"]
     }
+  },
+  international: {
+    // No provinces or cities as per requirement
   }
 };
 
@@ -268,9 +294,15 @@ const CategoriesAndLocation = () => {
     category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const filteredLocations = selectedType === 'international' 
+    ? [] // No locations for international as per requirement
+    : locations.canada.provinces.filter(province =>
+        province.toLowerCase().includes(locationQuery.toLowerCase())
+      );
+
   return (
     <div className="min-h-screen bg-white" style={{ textAlign: 'left' }}>
-      <SharedHeader11/>
+      <SharedHeader11 />
       
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Type Selector */}
@@ -328,6 +360,7 @@ const CategoriesAndLocation = () => {
               value={locationQuery}
               onChange={(e) => setLocationQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              disabled={selectedType === 'international'} // Disable for international
             />
           </div>
         </div>
@@ -407,29 +440,30 @@ const CategoriesAndLocation = () => {
             <MapPin className="h-5 w-5 text-blue-600" />
             Available Locations
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {locations.canada.provinces.map((province, index) => (
-              <Card key={index} className="p-4 bg-white">
-                <h3 className="font-medium mb-3">{province}</h3>
-                <div className="space-y-2">
-                  {locations.canada.cities[province.toLowerCase()].map((city, cityIndex) => (
-                    <div 
-                      key={cityIndex}
-                      className="text-sm text-gray-600 hover:text-blue-600 cursor-pointer"
-                    >
-                      {city}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            ))}
-          </div>
+          {selectedType === 'international' ? (
+            <p className="text-gray-600">Available worldwide - no specific locations</p>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredLocations.map((province, index) => (
+                <Card key={index} className="p-4 bg-white">
+                  <h3 className="font-medium mb-3">{province}</h3>
+                  <div className="space-y-2">
+                    {locations.canada.cities[province.toLowerCase()]?.map((city, cityIndex) => (
+                      <div 
+                        key={cityIndex}
+                        className="text-sm text-gray-600 hover:text-blue-600 cursor-pointer"
+                      >
+                        {city}
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </section>
       </main>
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
+      <br /><br /><br /><br />
       <SharedFooter2 />
     </div>
   );

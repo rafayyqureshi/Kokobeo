@@ -4,7 +4,8 @@ import {
   Filter, Search, ArrowUpRight, ArrowDownLeft,
   Clock, CheckCircle, XCircle, DollarSign,
   MessageCircle, Calendar, ChevronDown, ChevronRight,
-  FileText, Star, ExternalLink, AlertCircle, X
+  FileText, Star, ExternalLink, AlertCircle, X,
+  Receipt
 } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import SharedHeader4 from '../Headers/SharedHeader4';
@@ -70,8 +71,61 @@ const OffersDashboard = () => {
       messages: 3,
       attachments: 2,
       isPriority: false
+    }
+  ];
+
+  // Mock data for purchased quotes
+  const purchasedQuotes = [
+    {
+      id: 'QUO-2024-001',
+      type: 'purchased',
+      projectTitle: 'Bathroom Renovation',
+      client: {
+        name: 'Emily Davis',
+        rating: 4.7,
+        totalJobs: 18,
+        location: 'Calgary, AB'
+      },
+      purchaseAmount: 20.00,
+      purchaseCurrency: 'USD',
+      purchaseDate: '2024-02-20',
+      status: 'active',
+      description: 'Complete bathroom renovation including tiling and plumbing',
+      expectedDuration: '5 days',
+      requirements: [
+        'Experience with full renovations',
+        'Portfolio of previous work',
+        'Available next month'
+      ],
+      messages: 1,
+      attachments: 0,
+      isPriority: false
     },
-    // Add more mock offers as needed
+    {
+      id: 'QUO-2024-002',
+      type: 'purchased',
+      projectTitle: 'Website Redesign',
+      client: {
+        name: 'Mark Johnson',
+        rating: 4.9,
+        totalJobs: 30,
+        location: 'Remote'
+      },
+      purchaseAmount: 15,
+      purchaseCurrency: 'Credits',
+      purchaseDate: '2024-02-22',
+      status: 'responded',
+      description: 'Redesign of corporate website with modern UI/UX',
+      expectedDuration: '3 weeks',
+      requirements: [
+        'UI/UX design expertise',
+        'Experience with WordPress',
+        'Portfolio required'
+      ],
+      messages: 4,
+      attachments: 2,
+      isPriority: false
+    }
   ];
 
   // Status badge component
@@ -81,7 +135,9 @@ const OffersDashboard = () => {
       accepted: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
       expired: 'bg-gray-100 text-gray-800',
-      completed: 'bg-blue-100 text-blue-800'
+      completed: 'bg-blue-100 text-blue-800',
+      active: 'bg-purple-100 text-purple-800', // Added for purchased quotes
+      responded: 'bg-teal-100 text-teal-800'   // Added for purchased quotes
     };
 
     const statusText = {
@@ -89,7 +145,9 @@ const OffersDashboard = () => {
       accepted: 'Accepted',
       rejected: 'Rejected',
       expired: 'Expired',
-      completed: 'Completed'
+      completed: 'Completed',
+      active: 'Active',
+      responded: 'Responded'
     };
 
     return (
@@ -99,9 +157,11 @@ const OffersDashboard = () => {
     );
   };
 
-  // Offer details modal
+  // Offer details modal (used for all offer types including purchased quotes)
   const OfferDetailsModal = ({ offer, onClose }) => {
     if (!offer) return null;
+
+    const isPurchasedQuote = offer.type === 'purchased';
 
     return (
       <motion.div
@@ -131,19 +191,23 @@ const OffersDashboard = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Offer Details</h3>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">{isPurchasedQuote ? 'Quote Details' : 'Offer Details'}</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Status</span>
                   <StatusBadge status={offer.status} />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Amount</span>
-                  <span className="font-medium">${offer.amount.toFixed(2)}</span>
+                  <span className="text-gray-600">{isPurchasedQuote ? 'Purchase Amount' : 'Amount'}</span>
+                  <span className="font-medium">
+                    {isPurchasedQuote 
+                      ? `${offer.purchaseCurrency === 'USD' ? '$' : '💎'}${offer.purchaseAmount.toFixed(2)}`
+                      : `$${offer.amount.toFixed(2)}`}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Expiry Date</span>
-                  <span>{new Date(offer.expiryDate).toLocaleDateString()}</span>
+                  <span className="text-gray-600">{isPurchasedQuote ? 'Purchase Date' : 'Expiry Date'}</span>
+                  <span>{new Date(isPurchasedQuote ? offer.purchaseDate : offer.expiryDate).toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Expected Duration</span>
@@ -193,7 +257,7 @@ const OffersDashboard = () => {
           </div>
 
           <div className="flex justify-end gap-3">
-            {offer.status === 'pending' && (
+            {offer.type === 'received' && offer.status === 'pending' ? (
               <>
                 <button 
                   onClick={() => {/* Handle rejection */}}
@@ -208,12 +272,15 @@ const OffersDashboard = () => {
                   Accept Offer
                 </button>
               </>
-            )}
-            {offer.status === 'accepted' && (
+            ) : offer.type === 'sent' && offer.status === 'accepted' ? (
               <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                 View Project
               </button>
-            )}
+            ) : offer.type === 'purchased' ? (
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                View Quote Details
+              </button>
+            ) : null}
           </div>
         </motion.div>
       </motion.div>
@@ -221,7 +288,7 @@ const OffersDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50"  style={{ textAlign: 'left' }}>
+    <div className="min-h-screen bg-gray-50" style={{ textAlign: 'left' }}>
       <SharedHeader4 />
       
       <main className="max-w-7xl mx-auto px-4 py-8">
@@ -240,7 +307,9 @@ const OffersDashboard = () => {
               <span className="text-sm text-gray-500">Total Offers</span>
             </div>
             <div className="mt-4">
-              <h3 className="text-2xl font-bold text-gray-900">35</h3>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {offers.length + purchasedQuotes.length}
+              </h3>
               <p className="text-sm text-gray-600">All time offers</p>
             </div>
           </Card>
@@ -253,7 +322,9 @@ const OffersDashboard = () => {
               <span className="text-sm text-gray-500">Accepted</span>
             </div>
             <div className="mt-4">
-              <h3 className="text-2xl font-bold text-gray-900">24</h3>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {offers.filter(o => o.status === 'accepted').length}
+              </h3>
               <p className="text-sm text-gray-600">Accepted offers</p>
             </div>
           </Card>
@@ -266,7 +337,9 @@ const OffersDashboard = () => {
               <span className="text-sm text-gray-500">Pending</span>
             </div>
             <div className="mt-4">
-              <h3 className="text-2xl font-bold text-gray-900">8</h3>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {offers.filter(o => o.status === 'pending').length}
+              </h3>
               <p className="text-sm text-gray-600">Awaiting response</p>
             </div>
           </Card>
@@ -351,7 +424,8 @@ const OffersDashboard = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Status
-                      </label><select
+                      </label>
+                      <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="w-full px-4 py-2 border rounded-lg"
@@ -361,6 +435,8 @@ const OffersDashboard = () => {
                         <option value="accepted">Accepted</option>
                         <option value="rejected">Rejected</option>
                         <option value="expired">Expired</option>
+                        <option value="active">Active (Purchased)</option>
+                        <option value="responded">Responded (Purchased)</option>
                       </select>
                     </div>
 
@@ -374,6 +450,7 @@ const OffersDashboard = () => {
                         <option value="all">All Types</option>
                         <option value="sent">Sent</option>
                         <option value="received">Received</option>
+                        <option value="purchased">Purchased</option>
                       </select>
                     </div>
                   </div>
@@ -397,7 +474,7 @@ const OffersDashboard = () => {
 
           {/* Offer Type Tabs */}
           <div className="px-4 border-b">
-            <div className="flex space-x-6">
+            <div className="flex space-x-6 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('received')}
                 className={`py-4 px-2 relative ${
@@ -430,13 +507,29 @@ const OffersDashboard = () => {
                   />
                 )}
               </button>
+              <button
+                onClick={() => setActiveTab('purchased')}
+                className={`py-4 px-2 relative ${
+                  activeTab === 'purchased'
+                    ? 'text-blue-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Purchased Quotes
+                {activeTab === 'purchased' && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                  />
+                )}
+              </button>
             </div>
           </div>
 
           {/* Offers List */}
           <div className="divide-y">
-            {offers
-              .filter(offer => offer.type === activeTab)
+            {(activeTab === 'purchased' ? purchasedQuotes : offers)
+              .filter(offer => activeTab !== 'purchased' ? offer.type === activeTab : true)
               .map((offer) => (
                 <div
                   key={offer.id}
@@ -456,7 +549,7 @@ const OffersDashboard = () => {
                         )}
                       </div>
                       <p className="text-sm text-gray-600 mb-2">
-                        Offer ID: {offer.id} • {offer.client.location}
+                        {activeTab === 'purchased' ? `Quote ID: ${offer.id}` : `Offer ID: ${offer.id}`} • {offer.client.location}
                       </p>
                       <p className="text-sm text-gray-600">
                         {offer.description}
@@ -465,10 +558,14 @@ const OffersDashboard = () => {
                     <div className="flex flex-col sm:items-end gap-2">
                       <StatusBadge status={offer.status} />
                       <p className="text-lg font-medium text-gray-900">
-                        ${offer.amount.toFixed(2)}
+                        {activeTab === 'purchased'
+                          ? `${offer.purchaseCurrency === 'USD' ? '$' : '💎'}${offer.purchaseAmount.toFixed(2)}`
+                          : `$${offer.amount.toFixed(2)}`}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Expires: {new Date(offer.expiryDate).toLocaleDateString()}
+                        {activeTab === 'purchased'
+                          ? `Purchased: ${new Date(offer.purchaseDate).toLocaleDateString()}`
+                          : `Expires: ${new Date(offer.expiryDate).toLocaleDateString()}`}
                       </p>
                     </div>
                   </div>
@@ -488,7 +585,7 @@ const OffersDashboard = () => {
                     </div>
                   </div>
 
-                  {offer.status === 'pending' && activeTab === 'received' && (
+                  {offer.type === 'received' && offer.status === 'pending' && (
                     <div className="flex gap-2 mt-4">
                       <button
                         onClick={(e) => {
@@ -510,6 +607,19 @@ const OffersDashboard = () => {
                       </button>
                     </div>
                   )}
+                  {offer.type === 'purchased' && (
+                    <div className="flex gap-2 mt-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Handle view quote details
+                        }}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        View Quote Details
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
           </div>
@@ -525,13 +635,10 @@ const OffersDashboard = () => {
           )}
         </AnimatePresence>
       </main>
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
+      <br /><br /><br /><br />
 
       {/* Footer Actions - Mobile Only */}
-      <SharedFooter2/>
+      <SharedFooter2 />
     </div>
   );
 };

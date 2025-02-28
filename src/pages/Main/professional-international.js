@@ -15,7 +15,6 @@ import SettingsModal from './SettingsModal';
 import ProfileModal from './ProfileModal';
 import Tooltip from '../../components/ui/tooltip';
 import SharedFooter2 from '../../Footer/SharedFooter2';
-import SharedHeader3 from '../../Headers/SharedHeader3';
 import SharedHeader11 from '../../Headers/SharedHeader11';
 
 // Mock user data
@@ -31,7 +30,6 @@ const mockUserData = {
   emergencyAvailable: true
 };
 
-// Mock reviews data with quote associations
 // Mock reviews data with quote associations
 const mockReviews = [
   // Reviews for Quote 1 (12 reviews)
@@ -165,35 +163,32 @@ const mockReviews = [
     verified: true,
     helpful: 8
   },
-
-  // Add more reviews for Quote 1...
   {
-    id: 4,
+    id: 11,
     quoteId: 1,
-    author: "Emma R.",
-    date: "2024-01-12",
+    author: "Thomas G.",
+    date: "2024-01-05",
+    rating: 4,
+    text: "Reliable and detailed legal support for our international dealings.",
+    project: "Contract Review",
+    authorCompany: "Tech Pioneers",
+    authorImage: null,
+    verified: true,
+    helpful: 9
+  },
+  {
+    id: 12,
+    quoteId: 1,
+    author: "Julia B.",
+    date: "2024-01-04",
     rating: 5,
-    text: "Exceptional service in handling our international legal matters.",
+    text: "Top-notch service, highly recommended for legal expertise.",
     project: "Legal Services",
-    authorCompany: "Future Systems Inc",
+    authorCompany: "Bright Futures Inc",
     authorImage: null,
     verified: true,
     helpful: 10
   },
-  {
-    id: 5,
-    quoteId: 1,
-    author: "James L.",
-    date: "2024-01-11",
-    rating: 4,
-    text: "Professional and efficient service for our contract needs.",
-    project: "Contract Review",
-    authorCompany: "Global Ventures",
-    authorImage: null,
-    verified: true,
-    helpful: 7
-  },
-  // Continue adding more reviews for Quote 1 until you reach 12...
 
   // Reviews for Quote 2 (8 reviews)
   {
@@ -222,7 +217,84 @@ const mockReviews = [
     verified: true,
     helpful: 6
   },
-  // Add more reviews for Quote 2...
+  {
+    id: 15,
+    quoteId: 2,
+    author: "Claire S.",
+    date: "2024-01-08",
+    rating: 4,
+    text: "Solid guidance for our market entry plan.",
+    project: "Market Entry",
+    authorCompany: "Growth Partners",
+    authorImage: null,
+    verified: true,
+    helpful: 5
+  },
+  {
+    id: 16,
+    quoteId: 2,
+    author: "Peter K.",
+    date: "2024-01-07",
+    rating: 5,
+    text: "Fantastic insights into European markets.",
+    project: "Business Consulting",
+    authorCompany: "NextGen Solutions",
+    authorImage: null,
+    verified: true,
+    helpful: 9
+  },
+  {
+    id: 17,
+    quoteId: 2,
+    author: "Elena M.",
+    date: "2024-01-06",
+    rating: 4,
+    text: "Very helpful strategic advice.",
+    project: "Market Strategy",
+    authorCompany: "EuroTech Inc",
+    authorImage: null,
+    verified: true,
+    helpful: 7
+  },
+  {
+    id: 18,
+    quoteId: 2,
+    author: "Mark T.",
+    date: "2024-01-05",
+    rating: 5,
+    text: "Their market entry plan was spot on.",
+    project: "Business Development",
+    authorCompany: "Visionary Corp",
+    authorImage: null,
+    verified: true,
+    helpful: 10
+  },
+  {
+    id: 19,
+    quoteId: 2,
+    author: "Sophie L.",
+    date: "2024-01-04",
+    rating: 4,
+    text: "Good support for our expansion strategy.",
+    project: "Consulting Services",
+    authorCompany: "Bright Horizons",
+    authorImage: null,
+    verified: true,
+    helpful: 6
+  },
+  {
+    id: 20,
+    quoteId: 2,
+    author: "Liam B.",
+    date: "2024-01-03",
+    rating: 5,
+    text: "Expert consulting that delivered results.",
+    project: "Market Planning",
+    authorCompany: "Global Reach Ltd",
+    authorImage: null,
+    verified: true,
+    helpful: 8
+  },
 
   // Reviews for Quote 3 (15 reviews)
   {
@@ -250,8 +322,176 @@ const mockReviews = [
     authorImage: null,
     verified: true,
     helpful: 12
+  },
+  {
+    id: 23,
+    quoteId: 3,
+    author: "Hiroshi Y.",
+    date: "2024-01-03",
+    rating: 4,
+    text: "High-quality translation for our manuals.",
+    project: "Technical Documentation",
+    authorCompany: "Nippon Industries",
+    authorImage: null,
+    verified: true,
+    helpful: 10
+  },
+  {
+    id: 24,
+    quoteId: 3,
+    author: "Sophie H.",
+    date: "2024-01-02",
+    rating: 5,
+    text: "Accurate and fast translation service.",
+    project: "Manual Translation",
+    authorCompany: "Global Tech Co",
+    authorImage: null,
+    verified: true,
+    helpful: 11
+  },
+  {
+    id: 25,
+    quoteId: 3,
+    author: "Kenji M.",
+    date: "2024-01-01",
+    rating: 5,
+    text: "Top-notch technical translation work.",
+    project: "Specifications Translation",
+    authorCompany: "Tokyo Systems",
+    authorImage: null,
+    verified: true,
+    helpful: 14
+  },
+  {
+    id: 26,
+    quoteId: 3,
+    author: "Emily W.",
+    date: "2023-12-31",
+    rating: 4,
+    text: "Good quality translations for our documents.",
+    project: "Technical Translation",
+    authorCompany: "North Tech Inc",
+    authorImage: null,
+    verified: true,
+    helpful: 9
+  },
+  {
+    id: 27,
+    quoteId: 3,
+    author: "Takeshi N.",
+    date: "2023-12-30",
+    rating: 5,
+    text: "Flawless translation of complex manuals.",
+    project: "Manual Translation",
+    authorCompany: "Kyoto Innovations",
+    authorImage: null,
+    verified: true,
+    helpful: 13
+  },
+  {
+    id: 28,
+    quoteId: 3,
+    author: "Rachel G.",
+    date: "2023-12-29",
+    rating: 5,
+    text: "Highly professional translation service.",
+    project: "Document Translation",
+    authorCompany: "Global Solutions",
+    authorImage: null,
+    verified: true,
+    helpful: 10
+  },
+  {
+    id: 29,
+    quoteId: 3,
+    author: "Aiko S.",
+    date: "2023-12-28",
+    rating: 4,
+    text: "Reliable translation with quick turnaround.",
+    project: "Technical Specs",
+    authorCompany: "Osaka Tech Ltd",
+    authorImage: null,
+    verified: true,
+    helpful: 8
+  },
+  {
+    id: 30,
+    quoteId: 3,
+    author: "Mark R.",
+    date: "2023-12-27",
+    rating: 5,
+    text: "Great attention to detail in translations.",
+    project: "Manual Translation",
+    authorCompany: "Tech Pioneers",
+    authorImage: null,
+    verified: true,
+    helpful: 12
+  },
+  {
+    id: 31,
+    quoteId: 3,
+    author: "Naomi L.",
+    date: "2023-12-26",
+    rating: 5,
+    text: "Perfect service for our technical needs.",
+    project: "Technical Translation",
+    authorCompany: "Future Tech Inc",
+    authorImage: null,
+    verified: true,
+    helpful: 11
+  },
+  {
+    id: 32,
+    quoteId: 3,
+    author: "Shinji K.",
+    date: "2023-12-25",
+    rating: 4,
+    text: "Solid translation work for our specs.",
+    project: "Document Translation",
+    authorCompany: "Nippon Systems",
+    authorImage: null,
+    verified: true,
+    helpful: 9
+  },
+  {
+    id: 33,
+    quoteId: 3,
+    author: "Laura T.",
+    date: "2023-12-24",
+    rating: 5,
+    text: "Exceptional quality in translations.",
+    project: "Technical Manuals",
+    authorCompany: "Global Innovate",
+    authorImage: null,
+    verified: true,
+    helpful: 13
+  },
+  {
+    id: 34,
+    quoteId: 3,
+    author: "Taro H.",
+    date: "2023-12-23",
+    rating: 5,
+    text: "Highly accurate technical translations.",
+    project: "Specifications",
+    authorCompany: "Tokyo Tech Co",
+    authorImage: null,
+    verified: true,
+    helpful: 14
+  },
+  {
+    id: 35,
+    quoteId: 3,
+    author: "Clara P.",
+    date: "2023-12-22",
+    rating: 4,
+    text: "Good service for our document needs.",
+    project: "Translation Services",
+    authorCompany: "Bright Futures",
+    authorImage: null,
+    verified: true,
+    helpful: 10
   }
-  // Continue adding more reviews as needed...
 ];
 
 // Available service types
@@ -292,6 +532,7 @@ const menuItems = [
   { icon: CreditCard, label: 'My Credits', href: '/international/credits', badge: mockUserData.credits },
   { icon: Briefcase, label: 'My Projects', href: '/international/client/myorders', badge: '2 Active' }
 ];
+
 // Complete mock international opportunities data
 const internationalQuotes = [
   {
@@ -519,6 +760,7 @@ const InternationalProfessional = () => {
         return info;
     }
   };
+
   // Review Modal Component
   const ReviewModal = ({ isOpen, onClose, quote }) => {
     const [rating, setRating] = useState(0);
@@ -542,7 +784,6 @@ const InternationalProfessional = () => {
         setRating(0);
         setReviewText('');
         setProjectType('');
-        
       } catch (err) {
         setError('Failed to submit review. Please try again.');
       } finally {
@@ -659,20 +900,16 @@ const InternationalProfessional = () => {
       ? mockReviews.filter(review => review.quoteId === quote.id)
       : mockReviews;
 
-    const averageRating = relevantReviews.reduce((acc, curr) => acc + curr.rating, 0) / relevantReviews.length;
+    const averageRating = relevantReviews.length > 0 
+      ? relevantReviews.reduce((acc, curr) => acc + curr.rating, 0) / relevantReviews.length 
+      : 0;
 
-    const [sortBy, setSortBy] = useState('recent'); // 'recent', 'rating', 'helpful'
+    const [sortBy, setSortBy] = useState('recent'); // 'recent' or 'rating'
     const [filterRating, setFilterRating] = useState(0); // 0 means all ratings
 
     const sortedReviews = [...relevantReviews].sort((a, b) => {
-      switch(sortBy) {
-        case 'rating':
-          return b.rating - a.rating;
-        case 'helpful':
-          return b.helpful - a.helpful;
-        default: // recent
-          return new Date(b.date) - new Date(a.date);
-      }
+      if (sortBy === 'rating') return b.rating - a.rating; // Highest rating first
+      return new Date(b.date) - new Date(a.date); // Most recent first
     }).filter(review => filterRating === 0 || review.rating === filterRating);
 
     if (!isOpen) return null;
@@ -744,7 +981,6 @@ const InternationalProfessional = () => {
               >
                 <option value="recent">Most Recent</option>
                 <option value="rating">Highest Rating</option>
-                <option value="helpful">Most Helpful</option>
               </select>
             </div>
           </div>
@@ -798,9 +1034,6 @@ const InternationalProfessional = () => {
                     </button>
                   </div>
                 </div>
-
-                {/* Response from Professional */}
-                
               </div>
             ))}
 
@@ -814,6 +1047,7 @@ const InternationalProfessional = () => {
       </motion.div>
     );
   };
+
   // Chat Modal Component
   const ChatModal = ({ isOpen, onClose }) => {
     const [message, setMessage] = useState('');
@@ -1007,41 +1241,6 @@ const InternationalProfessional = () => {
                   </div>
                 </div>
 
-                {/* Reviews Section */}
-                {/* <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium">Reviews</h4>
-                    <Button
-                      variant="link"
-                      className="text-blue-600"
-                      onClick={() => {
-                        onClose();
-                        setShowReviewsList(true);
-                      }}
-                    >
-                      View All Reviews
-                    </Button>
-                  </div>
-                  <div className="space-y-4">
-                    {quote.reviews.slice(0, 2).map((review) => (
-                      <div key={review.id} className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <span className="font-medium">{review.author}</span>
-                            <div className="text-sm text-gray-500">{review.authorCompany}</div>
-                          </div>
-                          <div className="flex">
-                            {[...Array(review.rating)].map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="mt-2 text-gray-600">{review.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div> */}
-  
                 {/* Request Type Selection */}
                 <div className="space-y-4">
                   <h4 className="font-medium">Request Type</h4>
@@ -1140,6 +1339,7 @@ const InternationalProfessional = () => {
       </AnimatePresence>
     );
   };
+
   // Quote Card Component
   const renderQuoteCard = (quote) => (
     <Card 

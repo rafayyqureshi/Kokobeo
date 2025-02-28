@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import {
-  MessageSquare, Settings, Search, Filter,
-  AlertTriangle, CheckCircle, XCircle, User, Clock,
-  Eye, Ban, Flag, Download, Trash2,
-  Shield, MessageCircle, FileText,
-  Zap, DollarSign, FileCheck,
-  Briefcase, Tag, Plus,
-  PenTool, RefreshCw, Layers,
-  MapPin, BarChart2, Edit,
-  Building2, ArrowUpDown, MoveUp,
-  Video
+  MessageSquare, Settings, Search, Filter, AlertTriangle, CheckCircle, XCircle,
+  User, Clock, Eye, Ban, Flag, Download, Trash2, Shield, MessageCircle, FileText,
+  Zap, DollarSign, FileCheck, Briefcase, Tag, Plus, PenTool, RefreshCw, Layers,
+  MapPin, BarChart2, Edit, Building2, ArrowUpDown, MoveUp, Video, Copy, Globe,
+  Phone, Mail, ChevronDown, ChevronUp, Check
 } from 'lucide-react';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/Button';
@@ -21,9 +16,7 @@ const TabButton = ({ active, label, icon: Icon, onClick, className }) => (
   <button
     onClick={onClick}
     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
-      active 
-        ? 'bg-blue-100 text-blue-700' 
-        : 'text-gray-600 hover:bg-gray-100'
+      active ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
     } ${className || ''}`}
   >
     <Icon className="h-4 w-4" />
@@ -40,8 +33,10 @@ const ChatManagement = () => {
   const [showFormDetails, setShowFormDetails] = useState(false);
   const [formAnalyticsView, setFormAnalyticsView] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [editingChatId, setEditingChatId] = useState(null);
+  const [editedChatData, setEditedChatData] = useState({});
 
-  // Expanded mock data for chats that includes all form fields
+  // Mock data for chats with purchase and negotiation details
   const chats = [
     {
       id: 1,
@@ -50,15 +45,43 @@ const ChatManagement = () => {
         type: "Client",
         avatar: null,
         email: "john.smith@example.com",
-        phone: "+1 416-555-7890"
+        phone: "+1 416-555-7890",
+        whatsapp: "+1 416-555-7890",
+        country: "Canada",
+        province: "Ontario"
       },
-      professional: {
-        name: "Mike Wilson",
-        type: "Local Professional",
-        avatar: null,
-        email: "mike.wilson@example.com",
-        phone: "+1 647-555-1234"
-      },
+      professionals: [
+        {
+          name: "Mike Wilson",
+          type: "Local Professional",
+          email: "mike.wilson@example.com",
+          phone: "+1 647-555-1234",
+          whatsapp: "+1 647-555-1234",
+          country: "Canada",
+          province: "Ontario",
+          status: "hired",
+          purchased: true,
+          chatMessages: [
+            { sender: "John Smith", message: "Can you come today?", timestamp: "2024-02-20T14:35:00Z" },
+            { sender: "Mike Wilson", message: "Yes, I'll be there in 20 mins.", timestamp: "2024-02-20T14:37:00Z" }
+          ]
+        },
+        {
+          name: "Sarah Brown",
+          type: "Local Professional",
+          email: "sarah.brown@example.com",
+          phone: "+1 647-555-5678",
+          whatsapp: "+1 647-555-5678",
+          country: "Canada",
+          province: "Ontario",
+          status: "negotiating",
+          purchased: false,
+          chatMessages: [
+            { sender: "John Smith", message: "What's your rate?", timestamp: "2024-02-20T14:40:00Z" },
+            { sender: "Sarah Brown", message: "I charge $30/hr.", timestamp: "2024-02-20T14:42:00Z" }
+          ]
+        }
+      ],
       service: "Emergency Plumbing",
       category: "Plumbing",
       lastMessage: "I will be there in about 20 minutes.",
@@ -73,6 +96,9 @@ const ChatManagement = () => {
       formId: "EM-PLB-2024-001",
       location: "Toronto, ON",
       isEmergency: true,
+      isOnline: true,
+      purchasedBy: 1, // Number of professionals who purchased the form
+      maxPurchases: 5,
       formDetails: {
         problem: "Burst pipe with water leaking into kitchen",
         timeline: "Emergency (ASAP)",
@@ -120,34 +146,187 @@ const ChatManagement = () => {
         cleanupRequirements: "Full cleanup needed"
       },
       milestones: [
-        {
-          name: "Service Initiation",
-          percentage: 40,
-          status: "completed",
-          completedAt: "2024-02-20T15:00:00Z"
-        },
-        {
-          name: "Work Completion",
-          percentage: 50,
-          status: "pending",
-          completedAt: null
-        },
-        {
-          name: "Final Payment",
-          percentage: 10,
-          status: "pending",
-          completedAt: null
-        }
+        { name: "Service Initiation", percentage: 40, status: "completed", completedAt: "2024-02-20T15:00:00Z" },
+        { name: "Work Completion", percentage: 50, status: "pending", completedAt: null },
+        { name: "Final Payment", percentage: 10, status: "pending", completedAt: null }
       ]
     },
-    // Additional chat entries would follow the same expanded structure
+    {
+      id: 2,
+      customer: {
+        name: "Emma Johnson",
+        type: "Client",
+        avatar: null,
+        email: "emma.johnson@example.com",
+        phone: "+1 604-555-4321",
+        whatsapp: "+1 604-555-4321",
+        country: "Canada",
+        province: "British Columbia"
+      },
+      professionals: [
+        {
+          name: "Peter Lee",
+          type: "Local Professional",
+          email: "peter.lee@example.com",
+          phone: "+1 604-555-9876",
+          whatsapp: "+1 604-555-9876",
+          country: "Canada",
+          province: "British Columbia",
+          status: "negotiating",
+          purchased: true,
+          chatMessages: [
+            { sender: "Emma Johnson", message: "Can you quote for this?", timestamp: "2024-02-21T10:00:00Z" },
+            { sender: "Peter Lee", message: "I'll send a quote soon.", timestamp: "2024-02-21T10:05:00Z" }
+          ]
+        },
+        {
+          name: "Linda Chen",
+          type: "Local Professional",
+          email: "linda.chen@example.com",
+          phone: "+1 604-555-6543",
+          whatsapp: "+1 604-555-6543",
+          country: "Canada",
+          province: "British Columbia",
+          status: "negotiating",
+          purchased: true,
+          chatMessages: [
+            { sender: "Emma Johnson", message: "Are you available tomorrow?", timestamp: "2024-02-21T10:10:00Z" },
+            { sender: "Linda Chen", message: "Yes, I can be there.", timestamp: "2024-02-21T10:12:00Z" }
+          ]
+        }
+      ],
+      service: "Electrical Repair",
+      category: "Electrical",
+      lastMessage: "I'll send a quote soon.",
+      timestamp: "1 hour ago",
+      status: "active",
+      flagged: false,
+      messageCount: 5,
+      formType: "standard",
+      formStatus: "quoted",
+      submittedAt: "2024-02-21T09:00:00Z",
+      quotePrice: 20,
+      formId: "ST-ELE-2024-002",
+      location: "Vancouver, BC",
+      isEmergency: false,
+      isOnline: true,
+      purchasedBy: 2,
+      maxPurchases: 5,
+      formDetails: {
+        problem: "Faulty wiring in living room",
+        timeline: "Within 2 days",
+        address: "456 Oak St, Vancouver, BC",
+        images: [],
+        preferredContactMethod: "Email",
+        additionalNotes: "Lights flickering intermittently",
+        availability: "Tomorrow morning",
+        floorLevel: "First Floor",
+        hasElevator: false,
+        hasStairs: true,
+        buildingType: "Residential",
+        buildingDetails: "Apartment",
+        accessInstructions: "Use front entrance, buzz #301",
+        projectScope: "Wiring repair",
+        serviceArea: "Living Room",
+        propertyType: "Apartment",
+        serviceFrequency: "One-time",
+        preferredSchedule: "Morning",
+        budget: "$200-$300",
+        paymentMethod: "Cash",
+        serviceRequirements: "Certified electrician",
+        healthSafety: "No known hazards",
+        propertyAccess: "Tenant present",
+        insuranceInfo: "Renter's insurance",
+        previousWorkHistory: "Minor repairs last year",
+        projectConstraints: "Must finish by noon",
+        environmentalConcerns: "None",
+        regulatoryRequirements: "Follow local codes",
+        warrantyRequirements: "30-day warranty",
+        projectTimeline: "1 day",
+        communicationPreferences: "Email",
+        documentationRequired: "Invoice",
+        qualityStandards: "High-quality work",
+        postServiceRequirements: "Minimal cleanup",
+        equipmentRequirements: "Electrical tools",
+        materialPreferences: "Standard materials",
+        siteSurveyNeeded: false,
+        parkingAvailable: true,
+        utilitiesAvailable: true,
+        securityRequirements: "None",
+        workingHours: "9 AM - 12 PM",
+        noiseRestrictions: "Keep noise low",
+        wasteDisposal: "Dispose of old wiring",
+        cleanupRequirements: "Light cleanup"
+      },
+      milestones: [
+        { name: "Quote Acceptance", percentage: 30, status: "completed", completedAt: "2024-02-21T09:30:00Z" },
+        { name: "Service Scheduled", percentage: 60, status: "pending", completedAt: null },
+        { name: "Payment", percentage: 10, status: "pending", completedAt: null }
+      ]
+    }
   ];
 
+  // Form modification handlers
+  const handleEditChat = (chat) => {
+    setEditingChatId(chat.id);
+    setEditedChatData({ ...chat.formDetails });
+  };
+
+  const handleSaveChat = (chatId) => {
+    const updatedChats = chats.map(chat => 
+      chat.id === chatId ? { ...chat, formDetails: editedChatData } : chat
+    );
+    setEditingChatId(null);
+    setEditedChatData({});
+    // Here you'd typically update the backend with updatedChats
+  };
+
+  const handleToggleOffline = (chatId) => {
+    const updatedChats = chats.map(chat => 
+      chat.id === chatId ? { ...chat, isOnline: !chat.isOnline } : chat
+    );
+    // Update backend here
+  };
+
+  const handleCopyFormData = (chat) => {
+    const formData = JSON.stringify({ ...chat, professionals: undefined }, null, 2);
+    navigator.clipboard.writeText(formData);
+    alert("Form data copied to clipboard!");
+  };
+
   const FormDetailsModal = ({ chat, isOpen, onClose }) => {
+    const [isEditingModal, setIsEditingModal] = useState(false);
+    const [modalFormData, setModalFormData] = useState(chat ? { ...chat.formDetails } : {});
+
     if (!isOpen || !chat) return null;
 
+    const handleModalEdit = () => {
+      setIsEditingModal(true);
+    };
+
+    const handleModalSave = () => {
+      const updatedChats = chats.map(c => 
+        c.id === chat.id ? { ...c, formDetails: modalFormData } : c
+      );
+      setIsEditingModal(false);
+      // Update backend here
+    };
+
+    const handleModalCopy = () => {
+      const formData = JSON.stringify({ ...chat, formDetails: modalFormData, professionals: undefined }, null, 2);
+      navigator.clipboard.writeText(formData);
+      alert("Form data copied to clipboard!");
+    };
+
+    const handleModalToggleOffline = () => {
+      const updatedChats = chats.map(c => 
+        c.id === chat.id ? { ...c, isOnline: !c.isOnline } : c
+      );
+      // Update backend here
+    };
+
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"  style={{ textAlign: 'left' }}>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ textAlign: 'left' }}>
         <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white z-10">
             <div>
@@ -189,143 +368,72 @@ const ChatManagement = () => {
                   <div>
                     <span className="text-sm text-gray-500">Status</span>
                     <p className="font-medium flex items-center gap-2">
-                      {chat.formStatus === 'pending' && (
-                        <Badge className="bg-yellow-100 text-yellow-700">Pending</Badge>
-                      )}
-                      {chat.formStatus === 'quoted' && (
-                        <Badge className="bg-blue-100 text-blue-700">Quote Purchased</Badge>
-                      )}
-                      {chat.formStatus === 'hired' && (
-                        <Badge className="bg-green-100 text-green-700">Hired</Badge>
-                      )}
-                      {chat.isEmergency && (
-                        <Badge className="bg-red-100 text-red-700">Emergency</Badge>
-                      )}
+                      {chat.formStatus === 'pending' && <Badge className="bg-yellow-100 text-yellow-700">Pending</Badge>}
+                      {chat.formStatus === 'quoted' && <Badge className="bg-blue-100 text-blue-700">Quote Purchased</Badge>}
+                      {chat.formStatus === 'hired' && <Badge className="bg-green-100 text-green-700">Hired</Badge>}
+                      {chat.isEmergency && <Badge className="bg-red-100 text-red-700">Emergency</Badge>}
+                      <Badge className={chat.isOnline ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}>
+                        {chat.isOnline ? 'Online' : 'Offline'}
+                      </Badge>
                     </p>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Location Details */}
-            <div className="pt-4 border-t">
-              <h3 className="text-lg font-semibold mb-4">Location Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <MoveUp className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium">Floor Level</span>
-                    </div>
-                    <p className="mt-1 text-gray-600">{chat.formDetails.floorLevel}</p>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium">Building Type</span>
-                    </div>
-                    <p className="mt-1 text-gray-600">{chat.formDetails.buildingType}</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5 text-gray-500" />
-                      <span className="text-sm text-gray-700">
-                        {chat.formDetails.hasElevator ? 'Has Elevator' : 'No Elevator'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <ArrowUpDown className="h-5 w-5 text-gray-500" />
-                      <span className="text-sm text-gray-700">
-                        {chat.formDetails.hasStairs ? 'Has Stairs' : 'No Stairs'}
-                      </span>
-                    </div>
+                    <span className="text-sm text-gray-500">Purchased</span>
+                    <p className="font-medium">{chat.purchasedBy}/{chat.maxPurchases} Professionals</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Project Details */}
+            {/* Form Details */}
             <div className="pt-4 border-t">
-              <h3 className="text-lg font-semibold mb-4">Project Details</h3>
+              <h3 className="text-lg font-semibold mb-4">Form Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <span className="text-sm text-gray-500">Project Scope</span>
-                  <p className="mt-1 text-gray-700">{chat.formDetails.projectScope}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-500">Service Area</span>
-                  <p className="mt-1 text-gray-700">{chat.formDetails.serviceArea}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-500">Timeline</span>
-                  <p className="mt-1 text-gray-700">{chat.formDetails.timeline}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-500">Budget</span>
-                  <p className="mt-1 text-gray-700">{chat.formDetails.budget}</p>
-                </div>
+                {Object.entries(modalFormData).map(([key, value]) => (
+                  <div key={key}>
+                    <span className="text-sm text-gray-500">{key.split(/(?=[A-Z])/).join(" ")}</span>
+                    {isEditingModal ? (
+                      <input
+                        type="text"
+                        value={value}
+                        onChange={(e) => setModalFormData({ ...modalFormData, [key]: e.target.value })}
+                        className="mt-1 w-full p-2 border rounded-lg text-sm"
+                      />
+                    ) : (
+                      <p className="mt-1 text-gray-700">{Array.isArray(value) ? value.join(", ") : value}</p>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Additional Information */}
+            {/* Negotiation and Purchase Info */}
             <div className="pt-4 border-t">
-              <h3 className="text-lg font-semibold mb-4">Additional Information</h3>
+              <h3 className="text-lg font-semibold mb-4">Negotiation & Purchase</h3>
               <div className="space-y-4">
-                <div>
-                  <span className="text-sm text-gray-500">Special Requirements</span>
-                  <p className="mt-1 text-gray-700">{chat.formDetails.serviceRequirements}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-500">Access Instructions</span>
-                  <p className="mt-1 text-gray-700">{chat.formDetails.accessInstructions}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-500">Additional Notes</span>
-                  <p className="mt-1 text-gray-700">{chat.formDetails.additionalNotes}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Contact Information */}
-            <div className="pt-4 border-t">
-              <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium">Customer</h4>
-                  <div className="mt-2 space-y-2">
-                    <p className="text-sm">Name: {chat.customer.name}</p>
-                    <p className="text-sm">Email: {chat.customer.email}</p>
-                    <p className="text-sm">Phone: {chat.customer.phone}</p>
-                  </div>
-                </div>
-                {chat.professional && (
-                  <div>
-                    <h4 className="font-medium">Professional</h4>
-                    <div className="mt-2 space-y-2">
-                      <p className="text-sm">Name: {chat.professional.name}</p>
-                      <p className="text-sm">Email: {chat.professional.email}</p>
-                      <p className="text-sm">Phone: {chat.professional.phone}</p>
+                {chat.professionals.map((prof, index) => (
+                  <div key={index} className="p-3 border rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">{prof.name}</p>
+                        <p className="text-sm text-gray-500">{prof.status}</p>
+                      </div>
+                      <Badge className={prof.purchased ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}>
+                        {prof.purchased ? 'Purchased' : 'Not Purchased'}
+                      </Badge>
+                    </div>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">Chat:</p>
+                      {prof.chatMessages.map((msg, msgIndex) => (
+                        <p key={msgIndex} className="text-sm">
+                          {msg.sender}: {msg.message} <span className="text-xs text-gray-400">({new Date(msg.timestamp).toLocaleTimeString()})</span>
+                        </p>
+                      ))}
                     </div>
                   </div>
-                )}
+                ))}
               </div>
             </div>
-
-            {/* Attachments */}
-            {chat.formDetails.images && chat.formDetails.images.length > 0 && (
-              <div className="pt-4 border-t">
-                <h3 className="text-lg font-semibold mb-4">Attachments</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {chat.formDetails.images.map((image, index) => (
-                    <div key={index} className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-                      <img src={image} alt={`Attachment ${index + 1}`} className="object-cover rounded-lg" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Milestones */}
             {chat.milestones && chat.milestones.length > 0 && (
@@ -335,15 +443,9 @@ const ChatManagement = () => {
                   {chat.milestones.map((milestone, index) => (
                     <div key={index} className="flex items-center gap-4">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        milestone.status === 'completed' 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-gray-100 text-gray-500'
+                        milestone.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
                       }`}>
-                        {milestone.status === 'completed' ? (
-                          <CheckCircle className="h-5 w-5" />
-                        ) : (
-                          <Clock className="h-5 w-5" />
-                        )}
+                        {milestone.status === 'completed' ? <CheckCircle className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
@@ -366,9 +468,24 @@ const ChatManagement = () => {
             )}
 
             {/* Action Buttons */}
-            <div className="pt-4 border-t flex justify-end gap-3">
-              <Button variant="outline" onClick={onClose}>Close</Button>
-              <Button>Process Request</Button>
+            <div className="pt-4 border-t flex flex-wrap justify-end gap-2 sm:gap-3">
+              <Button variant="outline" onClick={handleModalCopy} className="w-full sm:w-auto">
+                <Copy className="h-4 w-4 mr-2" /> Copy Data
+              </Button>
+              <Button variant="outline" onClick={handleModalToggleOffline} className="w-full sm:w-auto">
+                {chat.isOnline ? <Ban className="h-4 w-4 mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+                {chat.isOnline ? 'Take Offline' : 'Put Online'}
+              </Button>
+              {isEditingModal ? (
+                <Button onClick={handleModalSave} className="w-full sm:w-auto">
+                  <Check className="h-4 w-4 mr-2" /> Save
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={handleModalEdit} className="w-full sm:w-auto">
+                  <Edit className="h-4 w-4 mr-2" /> Edit
+                </Button>
+              )}
+              <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Close</Button>
             </div>
           </div>
         </div>
@@ -377,96 +494,116 @@ const ChatManagement = () => {
   };
 
   const ChatCard = ({ chat }) => (
-    <Card className="p-4 hover:shadow-md transition-shadow"  style={{ textAlign: 'left' }}>
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4"  style={{ textAlign: 'left' }}>
-        <div className="flex flex-col sm:flex-row gap-4 w-full">
-          <div className="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
-            <User className="h-6 w-6 text-gray-600" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <h3 className="font-medium truncate">{chat.service}</h3>
-              {chat.formStatus === 'pending' && (
-                <Badge className="bg-yellow-100 text-yellow-700 w-fit">Pending</Badge>
-              )}
-              {chat.formStatus === 'quoted' && (
-                <Badge className="bg-blue-100 text-blue-700 w-fit">Quote Purchased</Badge>
-              )}
-              {chat.formStatus === 'hired' && (
-                <Badge className="bg-green-100 text-green-700 w-fit">Hired</Badge>
-              )}
-              {chat.isEmergency && (
-                <Badge className="bg-red-100 text-red-700 w-fit">Emergency</Badge>
-              )}
-              {chat.flagged && (
-                <Badge className="bg-red-100 text-red-700 w-fit">Flagged</Badge>
-              )}
+    <Card className="p-4 hover:shadow-md transition-shadow" style={{ textAlign: 'left' }}>
+      {editingChatId === chat.id ? (
+        <div className="space-y-4">
+          {Object.entries(editedChatData).map(([key, value]) => (
+            <div key={key}>
+              <label className="text-sm text-gray-500">{key.split(/(?=[A-Z])/).join(" ")}</label>
+              <input
+                type="text"
+                value={value}
+                onChange={(e) => setEditedChatData({ ...editedChatData, [key]: e.target.value })}
+                className="w-full mt-1 p-2 border rounded-lg text-sm"
+              />
             </div>
-            <div className="mt-1 text-sm text-gray-600">
-              <span className="block sm:inline">{chat.customer.name} (Client)</span>
-              <span className="hidden sm:inline"> → </span>
-              <span className="block sm:inline">{chat.professional ? chat.professional.name + ' (Professional)' : 'No Professional Assigned'}</span>
-            </div>
-            <div className="mt-1 text-sm text-gray-500">
-              <span className="flex items-center gap-1">
-                <Tag className="h-4 w-4" />
-                {chat.category}
-              </span>
-            </div>
-            <div className="mt-1 text-sm text-gray-500">
-              <span className="flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                {chat.location}
-              </span>
-            </div>
-            {chat.lastMessage && <p className="mt-2 text-sm">{chat.lastMessage}</p>}
-            <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500">
-              <span className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                {chat.timestamp}
-              </span>
-              <span className="flex items-center gap-1">
-                <FileText className="h-4 w-4" />
-                Form ID: {chat.formId}
-              </span>
-              {chat.messageCount > 0 && (
-                <span className="flex items-center gap-1">
-                  <MessageSquare className="h-4 w-4" />
-                  {chat.messageCount} messages
-                </span>
-              )}
-              {chat.quotePrice && (
-                <span className="flex items-center gap-1">
-                  <DollarSign className="h-4 w-4" />
-                  Quote: ${chat.quotePrice}
-                </span>
-              )}
-            </div>
+          ))}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setEditingChatId(null)}>Cancel</Button>
+            <Button onClick={() => handleSaveChat(chat.id)}>Save</Button>
           </div>
         </div>
-        <div className="flex gap-2 sm:ml-4 w-full sm:w-auto justify-end">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="sm:px-2"
-            onClick={() => {
-              setSelectedChat(chat);
-              setShowFormDetails(true);
-            }}
-          >
-            <FileCheck className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" className="sm:px-2">
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" className="sm:px-2">
-            <Ban className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" className="sm:px-2">
-            <Flag className="h-4 w-4" />
-          </Button>
+      ) : (
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full">
+            <div className="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
+              <User className="h-6 w-6 text-gray-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <h3 className="font-medium truncate">{chat.service}</h3>
+                <div className="flex flex-wrap gap-2">
+                  {chat.formStatus === 'pending' && <Badge className="bg-yellow-100 text-yellow-700">Pending</Badge>}
+                  {chat.formStatus === 'quoted' && <Badge className="bg-blue-100 text-blue-700">Quote Purchased</Badge>}
+                  {chat.formStatus === 'hired' && <Badge className="bg-green-100 text-green-700">Hired</Badge>}
+                  {chat.isEmergency && <Badge className="bg-red-100 text-red-700">Emergency</Badge>}
+                  <Badge className={chat.isOnline ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}>
+                    {chat.isOnline ? 'Online' : 'Offline'}
+                  </Badge>
+                  <Badge className="bg-purple-100 text-purple-700">{chat.purchasedBy}/{chat.maxPurchases} Purchased</Badge>
+                </div>
+              </div>
+              <div className="mt-1 text-sm text-gray-600">
+                <span className="block sm:inline">{chat.customer.name} (Client)</span>
+                {chat.professionals.length > 0 && (
+                  <>
+                    <span className="hidden sm:inline"> → </span>
+                    <span className="block sm:inline">
+                      {chat.professionals.map(prof => prof.name).join(", ")} ({chat.professionals.length} Professionals)
+                    </span>
+                  </>
+                )}
+              </div>
+              <div className="mt-1 text-sm text-gray-500">
+                <span className="flex items-center gap-1">
+                  <Tag className="h-4 w-4" />
+                  {chat.category}
+                </span>
+              </div>
+              <div className="mt-1 text-sm text-gray-500">
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-4 w-4" />
+                  {chat.location}
+                </span>
+              </div>
+              {chat.lastMessage && <p className="mt-2 text-sm">{chat.lastMessage}</p>}
+              <div className="mt-2 flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-500">
+                <span className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  {chat.timestamp}
+                </span>
+                <span className="flex items-center gap-1">
+                  <FileText className="h-4 w-4" />
+                  Form ID: {chat.formId}
+                </span>
+                {chat.messageCount > 0 && (
+                  <span className="flex items-center gap-1">
+                    <MessageSquare className="h-4 w-4" />
+                    {chat.messageCount} messages
+                  </span>
+                )}
+                {chat.quotePrice && (
+                  <span className="flex items-center gap-1">
+                    <DollarSign className="h-4 w-4" />
+                    Quote: ${chat.quotePrice}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2 sm:ml-4 w-full sm:w-auto justify-end">
+            <Button variant="ghost" size="sm" onClick={() => handleCopyFormData(chat)}>
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => handleEditChat(chat)}>
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => handleToggleOffline(chat.id)}>
+              {chat.isOnline ? <Ban className="h-4 w-4" /> : <RefreshCw className="h-4 w-4" />}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => {
+                setSelectedChat(chat);
+                setShowFormDetails(true);
+              }}
+            >
+              <FileCheck className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </Card>
   );
 
@@ -502,7 +639,7 @@ const ChatManagement = () => {
     };
 
     return (
-      <div className="space-y-6"  style={{ textAlign: 'left' }}>
+      <div className="space-y-6" style={{ textAlign: 'left' }}>
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Form Submission Overview</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -631,6 +768,107 @@ const ChatManagement = () => {
     );
   };
 
+  const ContactManagement = () => {
+    const [expandedCountries, setExpandedCountries] = useState({});
+
+    const toggleCountry = (country) => {
+      setExpandedCountries(prev => ({
+        ...prev,
+        [country]: !prev[country]
+      }));
+    };
+
+    const contactsByCountry = chats.reduce((acc, chat) => {
+      const customerCountry = chat.customer.country;
+      const customerProvince = chat.customer.province;
+      if (!acc[customerCountry]) acc[customerCountry] = {};
+      if (!acc[customerCountry][customerProvince]) acc[customerCountry][customerProvince] = { customers: [], professionals: [] };
+      acc[customerCountry][customerProvince].customers.push(chat.customer);
+
+      chat.professionals.forEach(prof => {
+        const profCountry = prof.country;
+        const profProvince = prof.province;
+        if (!acc[profCountry]) acc[profCountry] = {};
+        if (!acc[profCountry][profProvince]) acc[profCountry][profProvince] = { customers: [], professionals: [] };
+        acc[profCountry][profProvince].professionals.push(prof);
+      });
+      return acc;
+    }, {});
+
+    const exportContacts = () => {
+      const csvContent = [
+        "Type,Name,Email,Phone,WhatsApp,Country,Province",
+        ...Object.entries(contactsByCountry).flatMap(([country, provinces]) =>
+          Object.entries(provinces).flatMap(([province, { customers, professionals }]) => [
+            ...customers.map(c => `Customer,"${c.name}","${c.email}","${c.phone}","${c.whatsapp}","${country}","${province}"`),
+            ...professionals.map(p => `Professional,"${p.name}","${p.email}","${p.phone}","${p.whatsapp}","${country}","${province}"`)
+          ])
+        )
+      ].join("\n");
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "contacts_export.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    return (
+      <div className="space-y-6" style={{ textAlign: 'left' }}>
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+          <div>
+            <h2 className="text-lg font-semibold">Contact Management</h2>
+            <p className="text-gray-600 mt-1">View and export customer and professional contacts</p>
+          </div>
+          <Button onClick={exportContacts} className="flex items-center gap-2 w-full sm:w-auto">
+            <Download className="h-4 w-4" />
+            Export Contacts
+          </Button>
+        </div>
+
+        {Object.entries(contactsByCountry).map(([country, provinces]) => (
+          <Card key={country} className="p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">{country}</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleCountry(country)}
+              >
+                {expandedCountries[country] ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </div>
+            {expandedCountries[country] && (
+              <div className="space-y-4">
+                {Object.entries(provinces).map(([province, { customers, professionals }]) => (
+                  <div key={province}>
+                    <h4 className="font-medium mb-2">{province}</h4>
+                    <div className="space-y-2">
+                      {customers.map((c, i) => (
+                        <div key={`c-${i}`} className="flex flex-col sm:flex-row gap-2 text-sm">
+                          <span className="font-medium w-24">Customer:</span>
+                          <span>{c.name} | {c.email} | {c.phone} | WhatsApp: {c.whatsapp}</span>
+                        </div>
+                      ))}
+                      {professionals.map((p, i) => (
+                        <div key={`p-${i}`} className="flex flex-col sm:flex-row gap-2 text-sm">
+                          <span className="font-medium w-24">Professional:</span>
+                          <span>{p.name} | {p.email} | {p.phone} | WhatsApp: {p.whatsapp}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
+    );
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'active':
@@ -639,7 +877,7 @@ const ChatManagement = () => {
         }
         
         return (
-          <div className="space-y-6"  style={{ textAlign: 'left' }}>
+          <div className="space-y-6" style={{ textAlign: 'left' }}>
             <div className="flex flex-col sm:flex-row justify-between gap-4">
               <div className="flex flex-col sm:flex-row gap-4 flex-1">
                 <div className="relative flex-1">
@@ -722,16 +960,14 @@ const ChatManagement = () => {
             )}
 
             <div className="space-y-4">
-              {chats.map(chat => (
-                <ChatCard key={chat.id} chat={chat} />
-              ))}
+              {chats.map(chat => <ChatCard key={chat.id} chat={chat} />)}
             </div>
           </div>
         );
 
       case 'rules':
         return (
-          <div className="space-y-6"  style={{ textAlign: 'left' }}>
+          <div className="space-y-6" style={{ textAlign: 'left' }}>
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
               <div>
                 <h2 className="text-lg font-semibold">Chat Rules</h2>
@@ -794,7 +1030,7 @@ const ChatManagement = () => {
 
       case 'reports':
         return (
-          <div className="space-y-6"  style={{ textAlign: 'left' }}>
+          <div className="space-y-6" style={{ textAlign: 'left' }}>
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
               <div>
                 <h2 className="text-lg font-semibold">Chat Reports</h2>
@@ -872,10 +1108,9 @@ const ChatManagement = () => {
           </div>
         );
 
-        
-        case 'forms':
+      case 'forms':
         return (
-          <div className="space-y-6"  style={{ textAlign: 'left' }}>
+          <div className="space-y-6" style={{ textAlign: 'left' }}>
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
               <div>
                 <h2 className="text-lg font-semibold">Form Management</h2>
@@ -952,7 +1187,7 @@ const ChatManagement = () => {
                 </div>
               </Card>
               
-              <Card className="p-6"  style={{ textAlign: 'left' }}>
+              <Card className="p-6">
                 <h3 className="font-medium mb-4">Form Settings</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-3 border rounded-lg">
@@ -1007,7 +1242,6 @@ const ChatManagement = () => {
               </Button>
             </div>
 
-            {/* Video Call Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card className="p-4 sm:p-6">
                 <div className="flex justify-between items-start">
@@ -1058,7 +1292,6 @@ const ChatManagement = () => {
               </Card>
             </div>
 
-            {/* Video Call Settings */}
             <Card className="p-6">
               <h3 className="font-medium mb-4">Video Call Settings</h3>
               <div className="space-y-4">
@@ -1108,7 +1341,6 @@ const ChatManagement = () => {
               </div>
             </Card>
 
-            {/* Advanced Settings */}
             <Card className="p-6">
               <h3 className="font-medium mb-4">Advanced Settings</h3>
               <div className="space-y-4">
@@ -1146,13 +1378,16 @@ const ChatManagement = () => {
           </div>
         );
 
+      case 'contacts':
+        return <ContactManagement />;
+
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50"  style={{ textAlign: 'left' }}>
+    <div className="min-h-screen bg-gray-50" style={{ textAlign: 'left' }}>
       <AdminHeader />
       
       <main className="lg:pl-64 pt-16">
@@ -1219,33 +1454,7 @@ const ChatManagement = () => {
 
             {/* Tabs */}
             <div className="flex flex-wrap gap-2 border-b overflow-x-auto pb-1">
-              
-            <TabButton
-              active={activeTab === 'active'}
-              label="Form Submissions"
-              icon={MessageSquare}
-              onClick={() => {
-                setActiveTab('active');
-                setFormAnalyticsView(false);
-              }}
-              className="whitespace-nowrap"
-            />
-            <TabButton
-              active={activeTab === 'video'}
-              label="Video Calls"
-              icon={Video}
-              onClick={() => setActiveTab('video')}
-              className="whitespace-nowrap"
-            />
-            <TabButton
-              active={activeTab === 'forms'}
-              label="Form Templates"
-              icon={Layers}
-              onClick={() => setActiveTab('forms')}
-              className="whitespace-nowrap"
-            />
-              
-              {/* <TabButton
+              <TabButton
                 active={activeTab === 'active'}
                 label="Form Submissions"
                 icon={MessageSquare}
@@ -1254,14 +1463,21 @@ const ChatManagement = () => {
                   setFormAnalyticsView(false);
                 }}
                 className="whitespace-nowrap"
-              /> */}
-              {/* <TabButton
+              />
+              <TabButton
+                active={activeTab === 'video'}
+                label="Video Calls"
+                icon={Video}
+                onClick={() => setActiveTab('video')}
+                className="whitespace-nowrap"
+              />
+              <TabButton
                 active={activeTab === 'forms'}
                 label="Form Templates"
                 icon={Layers}
                 onClick={() => setActiveTab('forms')}
                 className="whitespace-nowrap"
-              /> */}
+              />
               <TabButton
                 active={activeTab === 'rules'}
                 label="Chat Rules"
@@ -1276,10 +1492,17 @@ const ChatManagement = () => {
                 onClick={() => setActiveTab('reports')}
                 className="whitespace-nowrap"
               />
+              <TabButton
+                active={activeTab === 'contacts'}
+                label="Contacts"
+                icon={Globe}
+                onClick={() => setActiveTab('contacts')}
+                className="whitespace-nowrap"
+              />
             </div>
 
             {/* Tab Content */}
-            <div className="min-h-[300px]">
+            <div className="min-h-[300px">
               {renderContent()}
             </div>
             

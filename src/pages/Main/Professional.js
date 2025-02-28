@@ -5,7 +5,7 @@ import {
   DollarSign, UserCheck, Settings, Calendar, Bell, LogOut, User, Briefcase,
   Tool, Cog, CreditCard, HelpCircle, ChevronDown, Lock, BookOpen, FileCheck,
   AlertTriangle, Award, Building, Zap, Hammer, Plus, Clock3, Globe, Languages, 
-  ArrowUpCircle, Building2, Stairs as StairsIcon, MoveUp, ArrowUpDown
+  ArrowUpCircle, Building2, Stairs as StairsIcon, MoveUp, ArrowUpDown, Send
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '../../components/ui/card';
@@ -16,7 +16,6 @@ import SettingsModal from './SettingsModal';
 import ProfileModal from './ProfileModal';
 import Tooltip from '../../components/ui/Tooltips';
 import SharedFooter from '../../Footer/SharedFooter';
-import ChatPopup from './chat';
 import SharedHeader9 from '../../Headers/SharedHeader9';
 import SharedHeader10 from '../../Headers/SharedHeader10';
 
@@ -30,7 +29,8 @@ const mockUserData = {
   company: "Smith Plumbing Services",
   location: "Toronto, ON",
   isVerified: true,
-  emergencyAvailable: true
+  emergencyAvailable: true,
+  isLoggedIn: true // Added to simulate login state
 };
 
 // Language options (English first)
@@ -45,33 +45,63 @@ const languages = [
   { code: 'cs', name: 'Čeština', short: 'CES' }
 ];
 
-// Mock reviews data
+// Mock reviews data tied to quotes
 const mockReviews = [
   {
+    quoteId: 1,
     id: 1,
     author: "Alex M.",
     date: "2024-01-15",
     rating: 5,
     text: "Excellent service! Very professional and thorough.",
-    project: "Pipe Repair"
+    project: "Emergency Water Leak Repair"
   },
   {
+    quoteId: 1,
     id: 2,
     author: "Sarah K.",
     date: "2024-01-10",
     rating: 4,
     text: "Great work, arrived on time and fixed the issue quickly.",
-    project: "Boiler Installation"
+    project: "Emergency Water Leak Repair"
   },
   {
+    quoteId: 2,
     id: 3,
     author: "Mike R.",
     date: "2024-01-05",
     rating: 5,
     text: "Very knowledgeable and professional. Would hire again.",
-    project: "Emergency Plumbing"
+    project: "Bathroom Renovation Quote"
   }
 ];
+
+// Mock quotes data (6 quotes)
+const quotes = Array(6).fill(null).map((_, index) => ({
+  id: index + 1,
+  type: index % 2 === 0 ? 'emergency' : 'standard',
+  category: index % 2 === 0 ? 'Plumbing' : 'Renovation',
+  title: index % 2 === 0 ? 'Emergency Water Leak Repair' : 'Bathroom Renovation Quote',
+  description: index % 2 === 0 
+    ? 'Major water leak in master bathroom requiring immediate attention.'
+    : 'Complete bathroom renovation needed, including tiling and fixtures.',
+  location: 'Toronto East',
+  municipality: 'East York',
+  timePosted: index % 2 === 0 ? '10 minutes ago' : '1 hour ago',
+  customer: {
+    name: 'J*** S***',
+    phone: '+1 4** *** **89',
+    email: 'j***@****.com',
+    address: '*** Queen Street'
+  },
+  hasPhotos: true,
+  hasVideos: index % 2 === 0,
+  price: 20,
+  hiring: true,
+  status: 'New',
+  rating: index % 2 === 0 ? 4.5 : 4.8,
+  reviewCount: index % 2 === 0 ? 2 : 1
+}));
 
 const ProfessionalDashboard = () => {
   // State management
@@ -91,9 +121,11 @@ const ProfessionalDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(null); // Changed to track quote-specific chat
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showReviewsList, setShowReviewsList] = useState(false);
+  const [showReviewsList, setShowReviewsList] = useState(null); // Changed to track quote-specific reviews
+  const [reviewSortBy, setReviewSortBy] = useState('recent'); // Added for review filtering
+  const [showLoginPopup, setShowLoginPopup] = useState(false); // Added for login/registration popup
 
   // Menu items with notifications included
   const menuItems = [
@@ -109,33 +141,6 @@ const ProfessionalDashboard = () => {
     { icon: CreditCard, label: 'My Credits', href: '/credits', badge: mockUserData.credits },
     { icon: Briefcase, label: 'My Projects', href: '/client/myorders', badge: '2 Active' }
   ];
-
-  // Mock quotes data (6 quotes)
-  const quotes = Array(6).fill(null).map((_, index) => ({
-    id: index + 1,
-    type: index % 2 === 0 ? 'emergency' : 'standard',
-    category: index % 2 === 0 ? 'Plumbing' : 'Renovation',
-    title: index % 2 === 0 ? 'Emergency Water Leak Repair' : 'Bathroom Renovation Quote',
-    description: index % 2 === 0 
-      ? 'Major water leak in master bathroom requiring immediate attention.'
-      : 'Complete bathroom renovation needed, including tiling and fixtures.',
-    location: 'Toronto East',
-    municipality: 'East York',
-    timePosted: index % 2 === 0 ? '10 minutes ago' : '1 hour ago',
-    customer: {
-      name: 'J*** S***',
-      phone: '+1 4** *** **89',
-      email: 'j***@****.com',
-      address: '*** Queen Street'
-    },
-    hasPhotos: true,
-    hasVideos: index % 2 === 0,
-    price: 20,
-    hiring: true,
-    status: 'New',
-    rating: 4.8,
-    reviewCount: 15
-  }));
 
   // Function to mask private information
   const maskPrivateInfo = (info, type) => {
@@ -182,16 +187,6 @@ const ProfessionalDashboard = () => {
             exit={{ scale: 0.95 }}
             className="bg-white rounded-xl max-w-lg w-full"
           >
-            {/* <div className="p-6 border-b flex justify-between items-center">
-              <h3 className="text-xl font-semibold">Write a Review</h3>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div> */}
-
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               {/* Rating Selection */}
               <div className="space-y-2">
@@ -252,9 +247,17 @@ const ProfessionalDashboard = () => {
     );
   };
 
-  // Reviews List Modal Component
-  const ReviewsListModal = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
+  // Reviews List Modal Component with Filters
+  const ReviewsListModal = ({ isOpen, onClose, quoteId }) => {
+    if (!isOpen || !quoteId) return null;
+
+    const filteredReviews = mockReviews
+      .filter(review => review.quoteId === quoteId)
+      .sort((a, b) => {
+        if (reviewSortBy === 'rating') return b.rating - a.rating; // Highest rating first
+        if (reviewSortBy === 'recent') return new Date(b.date) - new Date(a.date); // Most recent first
+        return 0;
+      });
 
     return (
       <AnimatePresence>
@@ -270,10 +273,12 @@ const ProfessionalDashboard = () => {
             exit={{ scale: 0.95 }}
             className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
           >
-            <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
+            <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-white z-10">
               <div>
                 <h3 className="text-xl font-semibold">Reviews</h3>
-                <p className="text-sm text-gray-500 mt-1">Average Rating: 4.8 (15 reviews)</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Average Rating: {quotes.find(q => q.id === quoteId)?.rating} ({filteredReviews.length} reviews)
+                </p>
               </div>
               <button
                 onClick={onClose}
@@ -283,8 +288,19 @@ const ProfessionalDashboard = () => {
               </button>
             </div>
 
+            <div className="p-6 border-b bg-gray-50">
+              <select
+                value={reviewSortBy}
+                onChange={(e) => setReviewSortBy(e.target.value)}
+                className="w-full p-2 border rounded-lg bg-white shadow-sm"
+              >
+                <option value="recent">Most Recent</option>
+                <option value="rating">Highest Rating</option>
+              </select>
+            </div>
+
             <div className="p-6 space-y-6">
-              {mockReviews.map((review) => (
+              {filteredReviews.map((review) => (
                 <div key={review.id} className="border-b last:border-0 pb-6 last:pb-0">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-3">
@@ -313,7 +329,125 @@ const ProfessionalDashboard = () => {
     );
   };
 
-  // Quote card component with Reviews
+  // Chat Modal Component with Preset Message and Login Popup
+  const ChatModal = ({ isOpen, onClose, quoteId }) => {
+    const [message, setMessage] = useState('Hello, I am interested in your service.');
+    const quote = quotes.find(q => q.id === quoteId);
+
+    if (!isOpen || !quoteId) return null;
+
+    const handleSend = () => {
+      if (!mockUserData.isLoggedIn) {
+        setShowLoginPopup(true);
+      } else {
+        // Handle message sending logic here
+        console.log('Message sent:', message);
+        setMessage('');
+      }
+    };
+
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.95 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.95 }}
+            className="bg-white rounded-xl max-w-2xl w-full h-[600px] flex flex-col shadow-lg"
+          >
+            <div className="p-4 border-b flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Chat about {quote.title}</h3>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="flex-1 p-4 overflow-y-auto">
+              <div className="space-y-4">
+                <div className="bg-gray-100 rounded-lg p-3 max-w-[80%]">
+                  <p className="text-sm">{message}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Type your message..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="flex-1 border rounded-lg px-4 py-2"
+                />
+                <Button onClick={handleSend}>
+                  <Send className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  };
+
+  // Login Popup Component
+  const LoginPopup = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.95 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.95 }}
+            className="bg-white rounded-xl max-w-md w-full p-6"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">Login Required</h3>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="text-gray-700 mb-6">Please log in or register to send a message.</p>
+            <div className="flex gap-4">
+              <Button
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => console.log('Login clicked')}
+              >
+                Login
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => console.log('Register clicked')}
+              >
+                Register
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  };
+
+  // Quote card component with Chat and Enhanced Reviews
   const renderQuoteCard = (quote) => (
     <Card 
       key={quote.id}
@@ -380,7 +514,7 @@ const ProfessionalDashboard = () => {
             <Button 
               variant="link" 
               className="text-blue-600 text-sm"
-              onClick={() => setShowReviewsList(true)}
+              onClick={() => setShowReviewsList(quote.id)}
             >
               View All
             </Button>
@@ -438,12 +572,21 @@ const ProfessionalDashboard = () => {
         {/* Actions */}
         <div className="pt-4 border-t space-y-3">
           {quote.type === 'emergency' ? (
-            <Button 
-              className="w-full bg-red-600 hover:bg-red-700 text-white"
-              onClick={() => setShowQuoteDetails(quote)}
-            >
-              Respond Now
-            </Button>
+            <>
+              <Button 
+                className="w-full bg-red-600 hover:bg-red-700 text-white"
+                onClick={() => setShowQuoteDetails(quote)}
+              >
+                Respond Now
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
+                onClick={() => setShowChat(quote.id)}
+              >
+                Chat Now
+              </Button>
+            </>
           ) : (
             <Button 
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
@@ -452,70 +595,12 @@ const ProfessionalDashboard = () => {
               Purchase Quote (${quote.price})
             </Button>
           )}
-          {/* <Button
-            variant="outline"
-            className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
-            onClick={() => setShowReviewModal(true)}
-          >
-            Write a Review
-          </Button> */}
         </div>
-        </div>
+      </div>
     </Card>
   );
 
-  // Chat Modal Component
-  const ChatModal = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
-
-    return (
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        >
-          <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.95 }}
-            className="bg-white rounded-xl max-w-2xl w-full h-[600px] flex flex-col shadow-lg"
-          >
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Chat with Client</h3>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <div className="flex-1 p-4 overflow-y-auto">
-              <div className="space-y-4">
-                <div className="bg-gray-100 rounded-lg p-3 max-w-[80%]">
-                  <p className="text-sm">Hello! I'm interested in your services.</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-4 border-t">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Type your message..."
-                  className="flex-1 border rounded-lg px-4 py-2"
-                />
-                <Button>Send</Button>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      </AnimatePresence>
-    );
-  };
-
+  // Quote Details Modal
   const QuoteDetailsModal = ({ 
     quote, 
     isOpen, 
@@ -531,7 +616,7 @@ const ProfessionalDashboard = () => {
   
     const handleHiringAction = () => {
       if (requestType === 'hiring') {
-        setShowChat(true);
+        setShowChat(quote.id);
       } else {
         onClose();
       }
@@ -898,10 +983,14 @@ const ProfessionalDashboard = () => {
         setShowChat={setShowChat}
       />
       
-      <ChatModal
-        isOpen={showChat}
-        onClose={() => setShowChat(false)}
-      />
+      {quotes.map(quote => (
+        <ChatModal
+          key={quote.id}
+          isOpen={showChat === quote.id}
+          onClose={() => setShowChat(null)}
+          quoteId={quote.id}
+        />
+      ))}
       
       <SettingsModal 
         isOpen={showSettings}
@@ -919,9 +1008,18 @@ const ProfessionalDashboard = () => {
         onClose={() => setShowReviewModal(false)}
       />
       
-      <ReviewsListModal
-        isOpen={showReviewsList}
-        onClose={() => setShowReviewsList(false)}
+      {quotes.map(quote => (
+        <ReviewsListModal
+          key={quote.id}
+          isOpen={showReviewsList === quote.id}
+          onClose={() => setShowReviewsList(null)}
+          quoteId={quote.id}
+        />
+      ))}
+
+      <LoginPopup
+        isOpen={showLoginPopup}
+        onClose={() => setShowLoginPopup(false)}
       />
     </div>
   );

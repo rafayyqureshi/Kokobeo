@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import MobileMenu from './components/ui/mobile_menu';  // Adjust path as needed
+import MobileMenu from './components/ui/mobile_menu'; // Adjust path as needed
 import {
   Search, Globe, X, MessageSquare, Mail,
   HelpCircle, AlertCircle, Users, Star,
   Shield, Heart, Info, ChevronDown,
   Languages, Filter, MapPin, MessageCircle,
   Check, Calendar, Clock, Zap, Package,
-  Phone, User, FileText, ThumbsUp
+  Phone, User, FileText, ThumbsUp, Send
 } from 'lucide-react';
 import PolicyModals from './pages/Main/Policy';
 
-
-// Review Modal Component
+// Review Modal Component with Filters
 const ReviewModal = ({ isOpen, onClose, reviews }) => {
+  const [sortBy, setSortBy] = useState('recent');
+
   if (!isOpen) return null;
+
+  const sortedReviews = [...reviews].sort((a, b) => {
+    if (sortBy === 'rating') return b.rating - a.rating; // Highest rating first
+    if (sortBy === 'recent') return new Date(b.date) - new Date(a.date); // Most recent first
+    return 0;
+  });
 
   return (
     <motion.div
@@ -39,8 +46,19 @@ const ReviewModal = ({ isOpen, onClose, reviews }) => {
           </button>
         </div>
         
+        <div className="p-4 border-b bg-gray-50">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full p-2 border rounded-lg bg-white shadow-sm"
+          >
+            <option value="recent">Most Recent</option>
+            <option value="rating">Highest Rating</option>
+          </select>
+        </div>
+
         <div className="p-4 space-y-4">
-          {reviews.map((review) => (
+          {sortedReviews.map((review) => (
             <div key={review.id} className="border-b pb-4 last:border-b-0">
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2">
@@ -66,8 +84,6 @@ const ReviewModal = ({ isOpen, onClose, reviews }) => {
     </motion.div>
   );
 };
-
-
 
 // Info Popup Component
 const InfoPopup = ({ isOpen, onClose, title, content }) => {
@@ -101,14 +117,17 @@ const InfoPopup = ({ isOpen, onClose, title, content }) => {
   );
 };
 
-// Welcome Popup Component
+// Welcome Popup Component with IP-based Once-Only Display
 const WelcomePopup = ({ isOpen, onClose }) => {
   useEffect(() => {
-    if (isOpen) {
-      const timer = setTimeout(() => {
+    const hasSeenPopup = localStorage.getItem('hasSeenWelcomePopup');
+    if (!hasSeenPopup) {
+      setTimeout(() => {
         onClose();
+        localStorage.setItem('hasSeenWelcomePopup', 'true');
       }, 4000);
-      return () => clearTimeout(timer);
+    } else {
+      onClose();
     }
   }, [isOpen, onClose]);
 
@@ -126,6 +145,118 @@ const WelcomePopup = ({ isOpen, onClose }) => {
         Find the best professionals for your needs. Get quotes or hire directly from verified experts.
       </p>
     </motion.div>
+  );
+};
+
+// Chat Modal Component
+const ChatModal = ({ isOpen, onClose, service }) => {
+  const [message, setMessage] = useState('Hello, I am interested in your service.');
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const isLoggedIn = true; // Mock login state; replace with actual auth logic
+
+  if (!isOpen) return null;
+
+  const handleSend = () => {
+    if (!isLoggedIn) {
+      setShowLoginPopup(true);
+    } else {
+      console.log('Message sent:', message);
+      setMessage('');
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      >
+        <motion.div
+          initial={{ scale: 0.95 }}
+          animate={{ scale: 1 }}
+          exit={{ scale: 0.95 }}
+          className="bg-white rounded-xl max-w-2xl w-full h-[600px] flex flex-col shadow-lg"
+        >
+          <div className="p-4 border-b flex justify-between items-center">
+            <h3 className="text-lg font-semibold">Chat about {service}</h3>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          
+          <div className="flex-1 p-4 overflow-y-auto">
+            <div className="space-y-4">
+              <div className="bg-gray-100 rounded-lg p-3 max-w-[80%]">
+                <p className="text-sm">{message}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-4 border-t">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Type your message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="flex-1 border rounded-lg px-4 py-2"
+              />
+              <Button onClick={handleSend}>
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Login Popup within Chat Modal */}
+      {showLoginPopup && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-60 flex items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.95 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.95 }}
+            className="bg-white rounded-xl max-w-md w-full p-6"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">Login Required</h3>
+              <button
+                onClick={() => setShowLoginPopup(false)}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="text-gray-700 mb-6">Please log in or register to send a message.</p>
+            <div className="flex gap-4">
+              <Button
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => console.log('Login clicked')}
+              >
+                Login
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => console.log('Register clicked')}
+              >
+                Register
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -161,8 +292,7 @@ const ServiceCard = ({ professional, selectedType, onMessage, onContact }) => {
     }
   ];
 
-
-return (
+  return (
     <div className="border rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
       <div className="flex items-start gap-4 mb-4">
         <img 
@@ -188,7 +318,7 @@ return (
                 onClick={() => setShowReviewModal(true)}
                 className="mt-1 px-3 py-1 bg-blue-100 text-blue-600 rounded-md text-sm hover:bg-blue-200"
               >
-                 See all reviews
+                See all reviews
               </button>
             </div>
           </div>
@@ -272,6 +402,7 @@ return (
     </div>
   );
 };
+
 // Service Page Component
 const ServicePage = ({ service, onClose }) => {
   const [selectedProvince, setSelectedProvince] = useState('');
@@ -601,57 +732,51 @@ const ServicePage = ({ service, onClose }) => {
           </div>
 
           {/* Professionals Grid */}
-          {/* Professionals Grid */}
-<div className="p-4 sm:p-6">
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    {professionals.map((professional) => (
-      <ServiceCard
-        key={professional.id}
-        professional={professional}
-        selectedType={selectedType}
-        onMessage={handleMessage}
-        onContact={handleContact}
-      />
-    ))}
-  </div>
+          <div className="p-4 sm:p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {professionals.map((professional) => (
+                <ServiceCard
+                  key={professional.id}
+                  professional={professional}
+                  selectedType={selectedType}
+                  onMessage={handleMessage}
+                  onContact={handleContact}
+                />
+              ))}
+            </div>
 
-  {/* Pagination */}
-  <div className="mt-8 flex justify-center items-center gap-2">
-    <button
-      className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-gray-600 text-sm disabled:opacity-50"
-      disabled
-    >
-      Previous
-    </button>
-    
-    <div className="flex items-center gap-1">
-      <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-medium border-blue-200 border">
-        1
-      </button>
-      <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-600">
-        2
-      </button>
-      <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-600">
-        3
-      </button>
-      <span className="mx-1 text-gray-400">...</span>
-      <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-600">
-        10
-      </button>
-    </div>
+            {/* Pagination */}
+            <div className="mt-8 flex justify-center items-center gap-2">
+              <button
+                className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-gray-600 text-sm disabled:opacity-50"
+                disabled
+              >
+                Previous
+              </button>
+              
+              <div className="flex items-center gap-1">
+                <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-medium border-blue-200 border">
+                  1
+                </button>
+                <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-600">
+                  2
+                </button>
+                <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-600">
+                  3
+                </button>
+                <span className="mx-1 text-gray-400">...</span>
+                <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-600">
+                  10
+                </button>
+              </div>
 
-    <button
-      className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-gray-600 text-sm"
-    >
-      Next
-    </button>
-  </div>
-
-  {/* Results Count */}
-  {/* <div className="mt-4 text-center text-sm text-gray-500">
-    Showing 1-6 of 48 professionals
-  </div> */}
-</div>
+              <button
+                className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-gray-600 text-sm"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -664,7 +789,7 @@ const KokobeoHomepage = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(!localStorage.getItem('hasSeenWelcomePopup'));
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
@@ -673,6 +798,8 @@ const KokobeoHomepage = () => {
   const [showHiring, setShowHiring] = useState(false);
   const [showQuotes, setShowQuotes] = useState(false);
   const [showEmergency, setShowEmergency] = useState(false);
+  const [showChat, setShowChat] = useState(null);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   const languages = [
     'English',
@@ -723,14 +850,15 @@ const KokobeoHomepage = () => {
     }
   ];
 
-  // Menu items configuration
+  // Updated Menu items configuration with My Profile
   const menuItems = [
     { icon: Globe, text: "About Kokobeo", href: "/about" },
     { icon: Info, text: "How it Works", href: "/how-it-works" },
     { icon: MessageSquare, text: "Messages", href: "/messages", badge: "3" },
     { icon: Mail, text: "Contact Us", href: "/menu/contact" },
     { icon: HelpCircle, text: "Help Center", href: "/help" },
-    { icon: Users, text: "Invite Friends", href: "/invite" }
+    { icon: Users, text: "Invite Friends", href: "/invite" },
+    { icon: User, text: "My Profile", onClick: () => setShowLoginPopup(true) } // Added My Profile with popup trigger
   ];
 
   const features = [
@@ -846,9 +974,10 @@ const KokobeoHomepage = () => {
 
       {/* Mobile Menu */}
       <MobileMenu 
-  isOpen={showMobileMenu} 
-  onClose={() => setShowMobileMenu(false)} 
-/>
+        isOpen={showMobileMenu} 
+        onClose={() => setShowMobileMenu(false)}
+        menuItems={menuItems}
+      />
 
       {/* Main Content */}
       <main className="min-h-screen pt-20 sm:pt-24 pb-24 flex flex-col items-center justify-center px-3 sm:px-4">
@@ -859,7 +988,7 @@ const KokobeoHomepage = () => {
           </h1>
 
           {/* Search Bar Container */}
-          <div className=" w-full mx-auto mb-8 sm:mb-12 relative">
+          <div className="w-full mx-auto mb-8 sm:mb-12 relative">
             <div className="relative">
               <input
                 type="text"
@@ -880,24 +1009,34 @@ const KokobeoHomepage = () => {
           {/* Service Categories */}
           <div className="w-full grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             {serviceCategories.map((category, index) => (
-              <motion.button
+              <motion.div
                 key={index}
-                onClick={() => setSelectedService(category.id)}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex flex-col items-center justify-center 
-                  bg-white rounded-lg h-24 sm:h-[120px] 
+                className="bg-white rounded-lg h-24 sm:h-[120px] 
                   shadow-[0_2px_8px_rgba(0,0,0,0.05)]
                   hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] 
-                  transition-all cursor-pointer
-                  hover:bg-gray-50"
+                  transition-all"
               >
-                <category.icon className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mb-2" />
-                <p className="text-xs sm:text-sm text-center text-gray-700 px-2 line-clamp-2">
-                  {category.label}
-                </p>
-              </motion.button>
+                <button
+                  onClick={() => setSelectedService(category.id)}
+                  className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"
+                >
+                  <category.icon className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mb-2" />
+                  <p className="text-xs sm:text-sm text-center text-gray-700 px-2 line-clamp-2">
+                    {category.label}
+                  </p>
+                </button>
+                {category.id === 'emergency' && (
+                  <button
+                    onClick={() => setShowChat(category.label)}
+                    className="absolute bottom-2 right-2 text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    Chat Now
+                  </button>
+                )}
+              </motion.div>
             ))}
           </div>
         </div>
@@ -1102,6 +1241,61 @@ const KokobeoHomepage = () => {
         )}
       </AnimatePresence>
 
+      {/* Chat Modal */}
+      {serviceCategories.map(category => (
+        <ChatModal
+          key={category.id}
+          isOpen={showChat === category.label}
+          onClose={() => setShowChat(null)}
+          service={category.label}
+        />
+      ))}
+
+      {/* Login/Registration Popup */}
+      <AnimatePresence>
+        {showLoginPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white rounded-xl max-w-md w-full p-6"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold">Login or Register</h3>
+                <button
+                  onClick={() => setShowLoginPopup(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <p className="text-gray-700 mb-6">Please log in or register to access your profile.</p>
+              <div className="flex gap-4">
+                <Button
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => console.log('Login clicked')}
+                >
+                  Login
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => console.log('Register clicked')}
+                >
+                  Register
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Policy Modals */}
       <PolicyModals 
         showPrivacyModal={showPrivacyModal}
@@ -1110,6 +1304,22 @@ const KokobeoHomepage = () => {
         onCloseTerms={() => setShowTermsModal(false)}
       />
     </div>
+  );
+};
+
+// Assuming Button component is defined elsewhere; here's a simple placeholder if needed
+const Button = ({ className, variant, onClick, children }) => {
+  const baseStyle = "px-4 py-2 rounded-lg font-medium";
+  const variantStyle = variant === 'outline' 
+    ? 'border border-gray-300 text-gray-700 hover:bg-gray-50' 
+    : 'bg-blue-600 text-white hover:bg-blue-700';
+  return (
+    <button 
+      className={`${baseStyle} ${variantStyle} ${className}`} 
+      onClick={onClick}
+    >
+      {children}
+    </button>
   );
 };
 

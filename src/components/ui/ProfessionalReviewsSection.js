@@ -116,31 +116,48 @@ const ProfessionalReviewsSection = () => {
     }
   ];
 
-  const filteredReviews = useMemo(() => {
-    return professionalMockReviews.filter(review => {
+  const filteredAndSortedReviews = useMemo(() => {
+    let filtered = professionalMockReviews.filter(review => {
       if (filterStatus === 'all') return true;
+      if (filterStatus === 'completed') return review.status === 'Completed';
+      if (filterStatus === 'inProgress') return review.status === 'In Progress';
       if (selectedCategory !== 'all' && review.category !== selectedCategory) return false;
       return true;
     });
-  }, [filterStatus, selectedCategory]);
+
+    // Sorting logic for "rating" and "most recent"
+    if (sortBy === 'rating') {
+      filtered.sort((a, b) => b.rating - a.rating); // Highest rating first
+    } else if (sortBy === 'recent') {
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date)); // Most recent first
+    } else if (sortBy === 'amount') {
+      filtered.sort((a, b) => {
+        const amountA = parseFloat(a.amount.replace('$', '').replace(',', ''));
+        const amountB = parseFloat(b.amount.replace('$', '').replace(',', ''));
+        return amountB - amountA; // Highest amount first
+      });
+    }
+
+    return filtered;
+  }, [filterStatus, selectedCategory, sortBy]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50"  style={{ textAlign: 'left' }}>
+    <div className="flex flex-col min-h-screen bg-gray-50" style={{ textAlign: 'left' }}>
       <SharedHeader4 />
       
-      <div className="flex-grow px-4 md:px-6 lg:px-8 py-6 max-w-7xl mx-auto w-full">
+      <div className="flex-grow px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto w-full">
         <div className="space-y-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Professional Reviews</h2>
               <p className="text-gray-600 mt-1">Monitor and manage client feedback and ratings</p>
             </div>
-            <div className="flex gap-2 w-full md:w-auto">
-              <Button variant="outline" className="flex items-center gap-2 flex-1 md:flex-none justify-center">
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              <Button variant="outline" className="flex items-center gap-2 flex-1 justify-center">
                 <Download className="h-4 w-4" />
                 Export Reviews
               </Button>
-              <Button className="flex items-center gap-2 flex-1 md:flex-none justify-center">
+              <Button className="flex items-center gap-2 flex-1 justify-center">
                 <MessageCircle className="h-4 w-4" />
                 Contact Support
               </Button>
@@ -156,13 +173,13 @@ const ProfessionalReviewsSection = () => {
           )}
 
           <Card className="overflow-hidden shadow-lg">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 md:p-6 border-b">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-6 border-b">
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                <div className="flex flex-wrap gap-4 w-full lg:w-auto">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-4 w-full lg:w-auto">
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-4 py-2 border rounded-lg bg-white shadow-sm flex-1 md:flex-none"
+                    className="px-4 py-2 border rounded-lg bg-white shadow-sm w-full sm:w-auto"
                   >
                     <option value="all">All Reviews</option>
                     <option value="completed">Completed Projects</option>
@@ -171,7 +188,7 @@ const ProfessionalReviewsSection = () => {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="px-4 py-2 border rounded-lg bg-white shadow-sm flex-1 md:flex-none"
+                    className="px-4 py-2 border rounded-lg bg-white shadow-sm w-full sm:w-auto"
                   >
                     <option value="recent">Most Recent</option>
                     <option value="rating">Highest Rating</option>
@@ -180,7 +197,7 @@ const ProfessionalReviewsSection = () => {
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="px-4 py-2 border rounded-lg bg-white shadow-sm flex-1 md:flex-none"
+                    className="px-4 py-2 border rounded-lg bg-white shadow-sm w-full sm:w-auto"
                   >
                     <option value="all">All Categories</option>
                     <option value="Development">Development</option>
@@ -200,121 +217,127 @@ const ProfessionalReviewsSection = () => {
             </div>
 
             <div className="divide-y">
-              {filteredReviews.map((review) => (
-                <motion.div
-                  key={review.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="p-4 md:p-6 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white flex-shrink-0">
-                        {review.author.charAt(0)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-semibold text-lg">{review.author}</h3>
-                          {review.verified && (
-                            <Badge variant="secondary" className="bg-green-50 text-green-700">
-                              <Shield className="h-3 w-3 mr-1" />
-                              Verified Payment
-                            </Badge>
-                          )}
+              <AnimatePresence>
+                {filteredAndSortedReviews.map((review) => (
+                  <motion.div
+                    key={review.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="p-4 sm:p-6 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                          {review.author.charAt(0)}
                         </div>
-                        <p className="text-sm text-gray-600 font-medium">{review.clientCompany}</p>
-                        <div className="flex flex-wrap items-center gap-4 mt-1">
-                          <span className="text-sm text-gray-500 flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            {review.date}
-                          </span>
-                          <span className="text-sm text-gray-500 flex items-center gap-1">
-                            <MessageCircle className="h-4 w-4" />
-                            {review.engagement.comments} Comments
-                          </span>
-                          <span className="text-sm font-medium text-green-600">
-                            {review.amount}
-                          </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-semibold text-lg">{review.author}</h3>
+                            {review.verified && (
+                              <Badge variant="secondary" className="bg-green-50 text-green-700">
+                                <Shield className="h-3 w-3 mr-1" />
+                                Verified Payment
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600 font-medium">{review.clientCompany}</p>
+                          <div className="flex flex-wrap items-center gap-4 mt-1">
+                            <span className="text-sm text-gray-500 flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {review.date}
+                            </span>
+                            <span className="text-sm text-gray-500 flex items-center gap-1">
+                              <MessageCircle className="h-4 w-4" />
+                              {review.engagement.comments} Comments
+                            </span>
+                            <span className="text-sm font-medium text-green-600">
+                              {review.amount}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-start md:items-end gap-2">
+                        <div className="flex items-center">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`h-5 w-5 ${
+                                star <= review.rating
+                                  ? 'fill-yellow-400 text-yellow-400'
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <Badge className="bg-blue-50 text-blue-700">
+                            {review.category}
+                          </Badge>
+                          <Badge className={review.status === 'Completed' ? 
+                            'bg-green-50 text-green-700' : 
+                            'bg-yellow-50 text-yellow-700'
+                          }>
+                            {review.status}
+                          </Badge>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-start md:items-end gap-2">
-                      <div className="flex items-center">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className={`h-5 w-5 ${
-                              star <= review.rating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-gray-300'
-                            }`}
-                          />
+
+                    <div className="mt-4">
+                      <p className="text-gray-700 leading-relaxed">{review.text}</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {review.tags.map((tag, index) => (
+                          <Badge key={index} variant="outline" className="bg-gray-50">
+                            {tag}
+                          </Badge>
                         ))}
                       </div>
-                      <div className="flex gap-2">
-                        <Badge className="bg-blue-50 text-blue-700">
-                          {review.category}
-                        </Badge>
-                        <Badge className={review.status === 'Completed' ? 
-                          'bg-green-50 text-green-700' : 
-                          'bg-yellow-50 text-yellow-700'
-                        }>
-                          {review.status}
-                        </Badge>
+                    </div>
+
+                    <div className="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="flex flex-wrap items-center gap-4">
+                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
+                          <ThumbsUp className="h-4 w-4" />
+                          {review.helpful}
+                        </button>
+                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
+                          <ThumbsDown className="h-4 w-4" />
+                          {review.notHelpful}
+                        </button>
+                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
+                          <Share2 className="h-4 w-4" />
+                          Share
+                        </button>
+                        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
+                          <Flag className="h-4 w-4" />
+                          Report
+                        </button>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                          <Edit className="h-4 w-4 mr-1" />
+                          Respond
+                        </Button>
+                        <Button variant="outline" size="sm" className="text-blue-600 hover:text-blue-700 flex-1 sm:flex-none">
+                          <MessageCircle className="h-4 w-4 mr-1" />
+                          Message Client
+                        </Button>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <p className="text-gray-700 leading-relaxed">{review.text}</p>
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {review.tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" className="bg-gray-50">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div className="flex flex-wrap items-center gap-4">
-                      <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-                        <ThumbsUp className="h-4 w-4" />
-                        {review.helpful}
-                      </button>
-                      <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-                        <ThumbsDown className="h-4 w-4" />
-                        {review.notHelpful}
-                      </button>
-                      <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-                        <Share2 className="h-4 w-4" />
-                        Share
-                      </button>
-                      <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-                        <Flag className="h-4 w-4" />
-                        Report
-                      </button>
-                    </div>
-                    <div className="flex gap-2 w-full sm:w-auto">
-                      <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
-                        <Edit className="h-4 w-4 mr-1" />
-                        Respond
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-blue-600 hover:text-blue-700 flex-1 sm:flex-none">
-                        <MessageCircle className="h-4 w-4 mr-1" />
-                        Message Client
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           </Card>
         </div>
       </div>
 
-      <footer className="mt-auto bg-white border-t">
-        <SharedFooter3 />
+      <footer className="mt-auto bg-white border-t w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SharedFooter3 />
+        </div>
       </footer>
     </div>
   );

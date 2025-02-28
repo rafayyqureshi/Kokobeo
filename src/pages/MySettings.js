@@ -95,7 +95,7 @@ const MySettings = () => {
     { id: 'privacy', label: 'Privacy', icon: Eye },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'billing', label: 'Billing', icon: CreditCard },
-    { id: 'connected', label: 'Connected Accounts', icon: Globe }
+    { id: 'connected', label: 'Connected Accounts', icon: Globe } // Already present, verified
   ];
 
   // Languages available
@@ -150,7 +150,7 @@ const MySettings = () => {
               </nav>
             </Card>
 
-            {/* Danger Zone */}
+            {/* Danger Zone (Commented out as per original code) */}
             {/* <Card className="p-4 mt-6 border-red-200">
               <h3 className="text-sm font-medium text-red-700 mb-4">Danger Zone</h3>
               <div className="space-y-4">
@@ -249,11 +249,6 @@ const MySettings = () => {
                       </select>
                     </div>
                   </div>
-
-                  {/* Danger Zone */}
-           
-
-
                 </Card>
               </>
             )}
@@ -637,34 +632,6 @@ const MySettings = () => {
                 <Card className="p-6">
                   <h2 className="text-xl font-semibold mb-6">Connected Accounts</h2>
                   <div className="space-y-4">
-                    {/* GitHub */}
-                    {/* <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <Github className="h-6 w-6" />
-                        <div>
-                          <h3 className="font-medium">GitHub</h3>
-                          <p className="text-sm text-gray-500">
-                            Connect your GitHub account
-                          </p>
-                        </div>
-                      </div>
-                      <Button variant="outline">Connect</Button>
-                    </div> */}
-
-                    {/* LinkedIn */}
-                    {/* <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <Linkedin className="h-6 w-6" />
-                        <div>
-                          <h3 className="font-medium">LinkedIn</h3>
-                          <p className="text-sm text-gray-500">
-                            Connect your LinkedIn account
-                          </p>
-                        </div>
-                      </div>
-                      <Button variant="outline">Connect</Button>
-                    </div> */}
-
                     {/* StackOverflow */}
                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center gap-4">
@@ -718,13 +685,10 @@ const MySettings = () => {
         </div>
       )}
 
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
+      <br /><br /><br /><br />
 
-      {/* Footer Actions - Mobile Only */}
-      <SharedFooter2/>
+      {/* Footer Actions */}
+      <SharedFooter2 />
     </div>
   );
 };

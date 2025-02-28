@@ -1,22 +1,42 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Wallet, MessageCircle, User, FileText, Shield, Bell, Search, Bookmark, LogOut, Settings, Lock, AlertCircle, Briefcase, FileCheck, Menu, X, ChevronRight, Globe, Facebook, Twitter, Instagram, Linkedin, UserSearchIcon, User2, Settings2, ChartAreaIcon } from 'lucide-react';
+import { 
+  Home, Wallet, MessageCircle, User, FileText, Shield, 
+  Bell, Search, Bookmark, LogOut, Settings, Lock, 
+  AlertCircle, Briefcase, FileCheck, Menu, X, ChevronRight, 
+  Globe, Facebook, Twitter, Instagram, Linkedin, 
+  UserSearchIcon, User2, Settings2, ChartAreaIcon 
+} from 'lucide-react';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/Button';
 import PolicyModals from './PolicyModals';
 import SharedHeader4 from '../../Headers/SharedHeader4';
 import SharedFooter2 from '../../Footer/SharedFooter2';
 import SharedFooter3 from '../../Footer/SharedFooter3';
-
 import { MdReviews } from 'react-icons/md';
 import ProfessionalReviewsSection from '../../components/ui/ProfessionalReviewsSection';
 
 const InfoPopup = ({ isOpen, onClose, title, content }) => {
   if (!isOpen) return null;
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white rounded-xl max-w-lg w-full p-6 relative">
-        <button onClick={onClose} className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-full"><X className="h-5 w-5" /></button>
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      exit={{ opacity: 0 }} 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    >
+      <motion.div 
+        initial={{ scale: 0.95 }} 
+        animate={{ scale: 1 }} 
+        exit={{ scale: 0.95 }} 
+        className="bg-white rounded-xl max-w-lg w-full p-6 relative"
+      >
+        <button 
+          onClick={onClose} 
+          className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-full"
+        >
+          <X className="h-5 w-5" />
+        </button>
         <h3 className="text-xl font-semibold mb-4">{title}</h3>
         <div className="prose max-w-none">{content}</div>
       </motion.div>
@@ -134,8 +154,7 @@ const FreelancerDashboard = () => {
     { icon: <MessageCircle className="h-5 w-5" />, label: "Message or Video Call", href: "/MessageAndVideoCall" },
     { icon: <User2 className="h-5 w-5" />, label: "My Profile", href: "/myprofile" },
     { icon: <Settings2 className="h-5 w-5" />, label: "My Settings", href: "/Settings" },
-    // { icon: <User className="h-5 w-5" />, label: "Account Setup", href: "/international_professional_registration" },
-    { icon: <ChartAreaIcon className="h-5 w-5" />, label: "Progress", href: "/Progress" },
+    { icon: <ChartAreaIcon className="h-5 w-5" />, label: "Progress", href: "/Progress" }, // Already present, verified
     { icon: <FileCheck className="h-5 w-5" />, label: "My Orders", href: "/myorders" },
     { icon: <MdReviews className="h-5 w-5" />, label: "Reviews", href: "/professional/reviews" },
     { icon: <Bell className="h-5 w-5" />, label: "My Offers", href: "/myoffers" },
@@ -144,7 +163,6 @@ const FreelancerDashboard = () => {
     { icon: <Wallet className="h-5 w-5" />, label: "Wallet", href: "/wallet" },
     { icon: <FileText className="h-5 w-5" />, label: "Withdraw History", href: "/withdrawalhistroy" },
     { icon: <FileCheck className="h-5 w-5" />, label: "Subscriptions", href: "/credits" },
-    // { icon: <Settings className="h-5 w-5" />, label: "Profile Settings", href: "/profilesettings" },
     { icon: <Lock className="h-5 w-5" />, label: "Change Password", href: "/changepassword" },
     { icon: <AlertCircle className="h-5 w-5" />, label: "Account Delete", href: "/DeleteAccount" },
     { icon: <LogOut className="h-5 w-5" />, label: "Log Out", href: "/login" }
@@ -249,7 +267,7 @@ const FreelancerDashboard = () => {
         </AnimatePresence>
 
         {/* Main Content */}
-        <div className="flex-1 lg:pl-64"  style={{ textAlign: 'left' }}>
+        <div className="flex-1 lg:pl-64" style={{ textAlign: 'left' }}>
           <main className="p-4 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-8">
               {/* Welcome Section */}
@@ -320,9 +338,8 @@ const FreelancerDashboard = () => {
                 </div>
               </Card>
 
-
               {/* Projects Section */}
-              <Card className="overflow-hidden"  style={{ textAlign: 'left' }}>
+              <Card className="overflow-hidden" style={{ textAlign: 'left' }}>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 border-b gap-4">
                   <div>
                     <h2 className="text-xl font-bold text-gray-900">Active Projects</h2>
@@ -367,13 +384,13 @@ const FreelancerDashboard = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Button */}
-      {/* <button 
-        onClick={() => setIsMobileMenuOpen(true)}
-        className="fixed bottom-6 right-6 lg:hidden z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-      >
-        <Menu className="h-6 w-6" />
-      </button> */}
+      {/* Modals */}
+      <PolicyModals 
+        showPrivacyModal={showPrivacyModal}
+        showTermsModal={showTermsModal}
+        onClosePrivacy={() => setShowPrivacyModal(false)}
+        onCloseTerms={() => setShowTermsModal(false)}
+      />
     </div>
   );
 };

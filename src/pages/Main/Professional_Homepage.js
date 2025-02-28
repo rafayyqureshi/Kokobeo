@@ -28,8 +28,6 @@ const mockReviews = [
     authorImage: null,
     verified: true,
     helpful: 12,
-    
-    
   },
   {
     id: 2,
@@ -43,7 +41,6 @@ const mockReviews = [
     authorImage: null,
     verified: true,
     helpful: 8,
-
   },
   {
     id: 3,
@@ -57,8 +54,6 @@ const mockReviews = [
     authorImage: null,
     verified: true,
     helpful: 15,
-   
-    
   }
 ];
 
@@ -198,6 +193,7 @@ const ReviewModal = ({ isOpen, onClose, professional }) => {
     </AnimatePresence>
   );
 };
+
 // Reviews List Modal Component
 const ReviewsListModal = ({ isOpen, onClose, professional }) => {
   const relevantReviews = professional 
@@ -343,8 +339,6 @@ const ReviewsListModal = ({ isOpen, onClose, professional }) => {
                   </button>
                 </div>
               </div>
-
-              
             </div>
           ))}
 
@@ -358,7 +352,7 @@ const ReviewsListModal = ({ isOpen, onClose, professional }) => {
     </motion.div>
   );
 };
-// Professional Card Component
+
 // Professional Card Component
 const ProfessionalCard = ({ pro, selectedType }) => {
   const [showChatModal, setShowChatModal] = useState(false);
@@ -489,26 +483,6 @@ const ProfessionalCard = ({ pro, selectedType }) => {
   );
 };
 
-// Update professionals array to include review-related data
-const professionals = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    photo: "https://i.pinimg.com/236x/da/fd/f2/dafdf25168edcb2f0e1d8702797946cc.jpg",
-    service: "International Business Law",
-    rating: 4.9,
-    reviews: 156,
-    location: "Toronto, Canada",
-    languages: ["English", "French", "Spanish"],
-    description: "Specialized in international business law and cross-border transactions.",
-    price: "$200/hour",
-    expertise: ["Corporate Law", "International Trade", "Contract Law"],
-    availability: "Mon-Fri",
-    verified: true,
-    reviewsData: mockReviews.filter(review => review.proId === 1)
-  },
-  // ... rest of the professionals array with added reviewsData
-];
 // Service Page Component
 const ServicePage = ({ service, onClose }) => {
   const [selectedType, setSelectedType] = useState('hire');
@@ -571,7 +545,6 @@ const ServicePage = ({ service, onClose }) => {
       verified: true,
       reviewsData: mockReviews.filter(review => review.proId === 3)
     },
-    // ... rest of the professionals
   ];
 
   return (
@@ -966,11 +939,15 @@ const InfoPopup = ({ isOpen, onClose, title, content }) => {
 // Welcome Popup Component
 const WelcomePopup = ({ isOpen, onClose }) => {
   useEffect(() => {
-    if (isOpen) {
+    const hasSeenPopup = localStorage.getItem('hasSeenInternationalWelcomePopup');
+    if (!hasSeenPopup && isOpen) {
       const timer = setTimeout(() => {
         onClose();
+        localStorage.setItem('hasSeenInternationalWelcomePopup', 'true');
       }, 4000);
       return () => clearTimeout(timer);
+    } else if (hasSeenPopup) {
+      onClose();
     }
   }, [isOpen, onClose]);
 
@@ -995,7 +972,7 @@ const WelcomePopup = ({ isOpen, onClose }) => {
 const ProHomepage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(!localStorage.getItem('hasSeenInternationalWelcomePopup'));
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
@@ -1063,7 +1040,7 @@ const ProHomepage = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-4">
           <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo */}
-            <a href="/internationalhompage" className="flex items-center no-underline">
+            <a href="/internationalhomepage" className="flex items-center no-underline">
               <img 
                 src="https://assests.netlify.app/assets/images/logo.png" 
                 alt="Kokobeo"
@@ -1207,7 +1184,7 @@ const ProHomepage = () => {
                 <li>View certifications and expertise</li>
                 <li>Contact professionals directly</li>
                 <li>Discuss your requirements</li>
-                <li>Agree on terms and begin collaboration</li>
+                <li> Agree on terms and begin collaboration</li>
               </ul>
             </div>
           }

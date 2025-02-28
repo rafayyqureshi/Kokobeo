@@ -37,6 +37,7 @@ const ClientProfileSettings = () => {
     },
     company: {
       name: "TechVision Solutions Ltd",
+      tradingName: "", // Added new field as per request
       size: "50-100 employees",
       industry: "Technology & Software",
       description: "Leading digital transformation consultancy specializing in enterprise solutions",
@@ -164,8 +165,8 @@ const ClientProfileSettings = () => {
               </nav>
             </Card>
 
-            {/* Danger Zone
-            <Card className="p-4 mt-6 border-red-200">
+            {/* Danger Zone (Commented out as per original code) */}
+            {/* <Card className="p-4 mt-6 border-red-200">
               <h3 className="text-sm font-medium text-red-700 mb-4">Danger Zone</h3>
               <Button
                 variant="destructive"
@@ -177,8 +178,8 @@ const ClientProfileSettings = () => {
             </Card> */}
           </aside>
 
-{/* Settings Content */}
-<div className="flex-1">
+          {/* Settings Content */}
+          <div className="flex-1">
             {activeSection === 'profile' && (
               <Card className="p-6">
                 <h2 className="text-xl font-semibold mb-6">Profile Settings</h2>
@@ -687,7 +688,7 @@ const ClientProfileSettings = () => {
               </Card>
             )}
 
-{activeSection === 'company' && (
+            {activeSection === 'company' && (
               <div className="space-y-6">
                 {/* Basic Company Information */}
                 <Card className="p-6">
@@ -1024,18 +1025,13 @@ const ClientProfileSettings = () => {
                   </div>
                 </div>
               </Card>
-
-
-                      
-
-
             )}
           </div>
         </div>
       </div>
 
       {/* Delete Account Confirmation Modal */}
-                  {showDeleteConfirm && (
+      {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="w-full max-w-md mx-4 p-6">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-red-600">
@@ -1063,13 +1059,11 @@ const ClientProfileSettings = () => {
               </Button>
             </div>
           </Card>
-          
         </div>
       )}
 
-      
-{/* Save Button */}
-<div className="max-w-7xl mx-auto px-4 mb-8">
+      {/* Save Button */}
+      <div className="max-w-7xl mx-auto px-4 mb-8">
         <div className="flex justify-end">
           <Button 
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg shadow-lg flex items-center gap-2"
@@ -1084,11 +1078,7 @@ const ClientProfileSettings = () => {
           </Button>
         </div>
       </div>
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
+      <br /><br /><br /><br /><br />
 
       <SharedFooter2 />
     </div>

@@ -5,7 +5,8 @@ import {
   CheckCircle, AlertCircle, Filter,
   List, Grid, Star, User, Package,
   MoreHorizontal, ChevronDown, Receipt,
-  FileCheck, Timer, Briefcase, MapPin
+  FileCheck, Timer, Briefcase, MapPin,
+  Send
 } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/Button';
@@ -93,6 +94,35 @@ const MyOrdersPage = () => {
         given: true,
         rating: 5,
         comment: 'Excellent service, very professional and clean work'
+      }
+    }
+  ];
+
+  // Mock data for request quotes
+  const requestQuotes = [
+    {
+      id: 'REQ-2024-001',
+      serviceType: 'Cleaning',
+      description: 'Deep cleaning of 3-bedroom apartment',
+      submittedDate: '2024-02-25',
+      status: 'pending',
+      responses: 3,
+      details: {
+        location: '123 Main St, Toronto',
+        preferredDate: '2024-03-01',
+        additionalNotes: 'Focus on kitchen and bathrooms'
+      }
+    },
+    {
+      id: 'REQ-2024-002',
+      serviceType: 'Graphic Design',
+      description: 'Logo design for new business',
+      submittedDate: '2024-02-20',
+      status: 'received',
+      responses: 5,
+      details: {
+        deliveryTimeline: '1 month',
+        additionalNotes: 'Need modern and minimalist style'
       }
     }
   ];
@@ -328,6 +358,118 @@ const MyOrdersPage = () => {
     );
   };
 
+  // Request Quote Card Component
+  const RequestQuoteCard = ({ request }) => {
+    return (
+      <Card className="p-4 sm:p-6 hover:shadow-lg transition-shadow" style={{ textAlign: 'left' }}>
+        <div className="flex flex-col gap-4">
+          {/* Request Header */}
+          <div className="flex flex-col sm:flex-row justify-between gap-2">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {request.serviceType}
+                </h3>
+                <Badge className="bg-blue-100 text-blue-800">
+                  Quote Request
+                </Badge>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+                <span>Request {request.id}</span>
+                <span className="hidden sm:inline">•</span>
+                <span>Submitted on {new Date(request.submittedDate).toLocaleDateString()}</span>
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" className="self-start">
+              <MoreHorizontal className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Description */}
+          <p className="text-gray-600">
+            {request.description}
+          </p>
+
+          {/* Request Details for Mobile */}
+          <div className="sm:hidden space-y-4 border-t border-b py-4">
+            <div>
+              <div className="text-sm text-gray-600">Status</div>
+              <Badge 
+                className={`
+                  ${request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                    request.status === 'received' ? 'bg-green-100 text-green-800' :
+                    'bg-gray-100 text-gray-800'}
+                `}
+              >
+                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+              </Badge>
+            </div>
+            <div>
+              <div className="text-sm text-gray-600">Responses</div>
+              <div className="font-medium">{request.responses} quotes received</div>
+            </div>
+            {request.details.location && (
+              <div>
+                <div className="text-sm text-gray-600">Location</div>
+                <div className="font-medium flex items-center gap-1">
+                  <MapPin className="h-4 w-4 text-gray-400" />
+                  {request.details.location}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3">
+            <Button className="flex items-center gap-2">
+              <Send className="h-4 w-4" />
+              <span className="hidden sm:inline">View Responses</span>
+              <span className="sm:hidden">Responses ({request.responses})</span>
+            </Button>
+            <Button variant="outline" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">View Details</span>
+              <span className="sm:hidden">Details</span>
+            </Button>
+          </div>
+
+          {/* Desktop Request Details */}
+          {viewMode === 'list' && (
+            <div className="hidden sm:block border-t pt-4 mt-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div>
+                  <div className="text-sm text-gray-600">Status</div>
+                  <Badge 
+                    className={`
+                      ${request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        request.status === 'received' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'}
+                    `}
+                  >
+                    {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                  </Badge>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">Responses</div>
+                  <div className="font-medium">{request.responses} quotes received</div>
+                </div>
+                {request.details.location && (
+                  <div>
+                    <div className="text-sm text-gray-600">Location</div>
+                    <div className="font-medium flex items-center gap-1">
+                      <MapPin className="h-4 w-4 text-gray-400" />
+                      {request.details.location}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </Card>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50" style={{ textAlign: 'left' }}>
       <SharedHeader5 />
@@ -370,6 +512,16 @@ const MyOrdersPage = () => {
                 }`}
               >
                 Past Orders ({pastOrders.length})
+              </button>
+              <button
+                onClick={() => setSelectedTab('requests')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
+                  selectedTab === 'requests'
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Request Quotes ({requestQuotes.length})
               </button>
             </div>
 
@@ -463,6 +615,8 @@ const MyOrdersPage = () => {
                     <option value="in-progress">In Progress</option>
                     <option value="completed">Completed</option>
                     <option value="cancelled">Cancelled</option>
+                    <option value="pending">Pending (Quotes)</option>
+                    <option value="received">Received (Quotes)</option>
                   </select>
                 </div>
 
@@ -537,7 +691,7 @@ const MyOrdersPage = () => {
                 <Button className="w-full sm:w-auto">Browse Services</Button>
               </div>
             )
-          ) : (
+          ) : selectedTab === 'past' ? (
             pastOrders.length > 0 ? (
               pastOrders.map(order => (
                 <OrderCard key={order.id} order={order} />
@@ -555,11 +709,29 @@ const MyOrdersPage = () => {
                 </p>
               </div>
             )
+          ) : (
+            requestQuotes.length > 0 ? (
+              requestQuotes.map(request => (
+                <RequestQuoteCard key={request.id} request={request} />
+              ))
+            ) : (
+              <div className="text-center py-8 sm:py-12">
+                <div className="mb-4">
+                  <FileText className="h-12 w-12 text-gray-400 mx-auto" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No Quote Requests
+                </h3>
+                <p className="text-gray-600">
+                  You haven't submitted any quote requests yet.
+                </p>
+              </div>
+            )
           )}
         </div>
 
         {/* Pagination */}
-        {(selectedTab === 'active' ? activeOrders : pastOrders).length > 0 && (
+        {(selectedTab === 'active' ? activeOrders : selectedTab === 'past' ? pastOrders : requestQuotes).length > 0 && (
           <div className="mt-6 sm:mt-8">
             <nav className="flex flex-col sm:flex-row justify-center items-center gap-2">
               <Button variant="outline" className="w-full sm:w-24">Previous</Button>

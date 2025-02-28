@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // Added AnimatePresence to import
 import {
   User, Edit, MapPin, Globe, Star, Shield, Award, FileText, Clock, DollarSign, 
   Briefcase, Languages, Mail, Phone, Link as LinkIcon, GitHub, Linkedin, Calendar, 
   Check, AlertCircle, Plus, X, Camera, MessageSquare, Heart, Tool, Building,
-  Lock, Bell, Settings, Trash2, PenTool
+  Lock, Bell, Settings, Trash2, PenTool, Home, ChartAreaIcon, Menu
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/badge';
@@ -24,6 +24,19 @@ const MyProfile = () => {
   const [editFormData, setEditFormData] = useState({});
   const [showEditModal, setShowEditModal] = useState(false);
   const [modalContent, setModalContent] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Sidebar items (added for professional view)
+  const sidebarItems = [
+    { icon: <Home className="h-5 w-5" />, label: "Dashboard", href: "/professionals" },
+    { icon: <MessageSquare className="h-5 w-5" />, label: "Messages", href: "/MessageAndVideoCall" },
+    { icon: <FileText className="h-5 w-5" />, label: "My Orders", href: "/myorders" },
+    { icon: <ChartAreaIcon className="h-5 w-5" />, label: "Progress", href: "/Progress" },
+    { icon: <Shield className="h-5 w-5" />, label: "Support Tickets", href: "/support" },
+    { icon: <User className="h-5 w-5" />, label: "My Profile", href: "/myprofile", active: true },
+    { icon: <Clock className="h-5 w-5" />, label: "Availability", href: "/availability" }, // Added as per request
+    { icon: <Settings className="h-5 w-5" />, label: "Settings", href: "/Settings" }
+  ];
 
   // Initial profile data state
   const [profileData, setProfileData] = useState({
@@ -43,7 +56,6 @@ const MyProfile = () => {
         skills: ["Web Design", "React", "UI/UX"],
         verifiedHire: true
       },
-      // ... (keeping existing review data)
     ],
     badges: {
       topRatedPlus: true,
@@ -478,39 +490,6 @@ const MyProfile = () => {
               </div>
             ))}
           </div>
-
-          {/* <div>
-            <h4 className="font-medium mb-3">Emergency Hours</h4>
-            {days.map(day => (
-              <div key={day} className="flex items-center gap-4 py-2">
-                <div className="w-24 capitalize">{day}</div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.emergencyHours[day].active}
-                    onChange={(e) => handleHourChange(day, 'emergencyHours', 'active', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-red-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
-                </label>
-                <input
-                  type="time"
-                  value={formData.emergencyHours[day].start}
-                  onChange={(e) => handleHourChange(day, 'emergencyHours', 'start', e.target.value)}
-                  disabled={!formData.emergencyHours[day].active}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-                <span>to</span>
-                <input
-                  type="time"
-                  value={formData.emergencyHours[day].end}
-                  onChange={(e) => handleHourChange(day, 'emergencyHours', 'end', e.target.value)}
-                  disabled={!formData.emergencyHours[day].active}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-            ))}
-          </div> */}
 
           <div className="flex justify-end gap-4">
             <Button
@@ -1229,379 +1208,456 @@ const MyProfile = () => {
   // Main component return
   return (
     <div className="min-h-screen bg-gray-50" style={{ textAlign: 'left' }}>
-      <SharedHeader4 />
-      
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8" style={{ textAlign: 'left' }}>
-        <div className="space-y-6">
-          {/* Profile Header */}
-          <Card className="p-6">
-            <div className="flex flex-col md:flex-row gap-6 items-start">
-              {/* Profile Image */}
-              <div className="relative">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100">
-                  <img 
-                    src={imageFile || profileData.personal.photo}
-                    alt={profileData.personal.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <label className="absolute bottom-2 right-2 p-2 bg-blue-600 rounded-full text-white hover:bg-blue-700 cursor-pointer">
-                    <Camera className="w-4 h-4" />
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          setImageFile(URL.createObjectURL(file));
-                        }
-                      }}
-                    />
-                  </label>
-                </div>
-                {profileData.personal.verified && (
-                  <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-1.5 rounded-full">
-                    <Shield className="w-4 h-4" />
-                  </div>
-                )}
-              </div>
+      {/* Fixed Header */}
+      <div className="fixed top-0 inset-x-0 z-50 bg-white border-b h-16">
+        <SharedHeader4 />
+      </div>
 
-              {/* Profile Info */}
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                      {profileData.personal.name}
-                      {profileData.personal.verified && (
-                        <Check className="w-5 h-5 text-green-500" />
-                      )}
-                    </h1>
-                    <p className="text-lg text-gray-600">{profileData.personal.title}</p>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {profileData.personal.location}
+      <div className="flex min-h-[calc(100vh-64px)] pt-16">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:block fixed left-0 top-16 bottom-0 w-64 bg-white border-r shadow-sm overflow-y-auto">
+          <nav className="p-4 space-y-1">
+            {sidebarItems.map((item, index) => (
+              <a
+                key={index}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
+                  item.active
+                    ? 'text-blue-600 bg-blue-50 font-medium'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </a>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Mobile Sidebar */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+              />
+              <motion.aside
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                className="fixed inset-y-0 left-0 w-full max-w-xs bg-white shadow-xl z-50 lg:hidden overflow-y-auto"
+              >
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <img src="https://assests.netlify.app/assets/images/logo.png" alt="Logo" className="h-8 w-8" />
+                      <span className="text-blue-600 text-lg font-bold">Kokobeo</span>
+                    </div>
+                    <button
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                    >
+                      <X className="h-6 w-6" />
+                    </button>
+                  </div>
+                  <nav className="space-y-1">
+                    {sidebarItems.map((item, index) => (
+                      <a
+                        key={index}
+                        href={item.href}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
+                          item.active
+                            ? 'text-blue-600 bg-blue-50 font-medium'
+                            : 'text-gray-600 hover:bg-gray-50'
+                        }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </a>
+                    ))}
+                  </nav>
+                </div>
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Main Content */}
+        <main className="flex-1 lg:pl-72 px-6 py-8 max-w-6xl mx-auto" style={{ textAlign: 'left' }}>
+          <div className="space-y-6">
+            {/* Profile Header */}
+            <Card className="p-6">
+              <div className="flex flex-col md:flex-row gap-6 items-start">
+                {/* Profile Image */}
+                <div className="relative">
+                  <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100">
+                    <img 
+                      src={imageFile || profileData.personal.photo}
+                      alt={profileData.personal.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <label className="absolute bottom-2 right-2 p-2 bg-blue-600 rounded-full text-white hover:bg-blue-700 cursor-pointer">
+                      <Camera className="w-4 h-4" />
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setImageFile(URL.createObjectURL(file));
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                  {profileData.personal.verified && (
+                    <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-1.5 rounded-full">
+                      <Shield className="w-4 h-4" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Profile Info */}
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                        {profileData.personal.name}
+                        {profileData.personal.verified && (
+                          <Check className="w-5 h-5 text-green-500" />
+                        )}
+                      </h1>
+                      <p className="text-lg text-gray-600">{profileData.personal.title}</p>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {profileData.personal.location}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 text-yellow-400" />
+                          {profileData.personal.rating} ({profileData.personal.completedProjects} reviews)
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        {profileData.personal.rating} ({profileData.personal.completedProjects} reviews)
-                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3">
+                      <Button 
+                        onClick={handlePersonalInfoEdit}
+                        variant="outline"
+                        className="hidden md:flex items-center gap-2"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit Profile
+                      </Button>
+                      <Button className="hidden md:flex items-center gap-2">
+                        <MessageSquare className="w-4 h-4" />
+                        Contact
+                      </Button>
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-3">
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">
+                        ${profileData.personal.totalEarned}
+                      </div>
+                      <div className="text-sm text-gray-600">Total Earned</div>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">
+                        {profileData.personal.completedProjects}
+                      </div>
+                      <div className="text-sm text-gray-600">Projects Completed</div>
+                    </div>
+                    <div className="bg-purple-50 p-4 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">
+                        {profileData.personal.successRate}%
+                      </div>
+                      <div className="text-sm text-gray-600">Success Rate</div>
+                    </div>
+                    <div className="bg-orange-50 p-4 rounded-lg">
+                      <div className="text-2xl font-bold text-orange-600">
+                        ${profileData.personal.hourlyRate}
+                      </div>
+                      <div className="text-sm text-gray-600">Hourly Rate</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <div className="flex flex-col lg:flex-row gap-8">
+              {/* Left Column */}
+              <div className="lg:w-2/3 space-y-6">
+                {/* About Section */}
+                <Card className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-xl font-semibold">About</h2>
                     <Button 
+                      variant="outline" 
+                      size="sm"
                       onClick={handlePersonalInfoEdit}
-                      variant="outline"
-                      className="hidden md:flex items-center gap-2"
                     >
                       <Edit className="w-4 h-4" />
-                      Edit Profile
-                    </Button>
-                    <Button className="hidden md:flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4" />
-                      Contact
                     </Button>
                   </div>
-                </div>
+                  <p className="text-gray-600">{profileData.personal.bio}</p>
+                </Card>
 
-                {/* Stats */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      ${profileData.personal.totalEarned}
-                    </div>
-                    <div className="text-sm text-gray-600">Total Earned</div>
+                {/* Availability Section */}
+                <Card className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-xl font-semibold">Availability</h2>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleAvailabilityEdit}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      {profileData.personal.completedProjects}
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-medium mb-2">Regular Hours</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries(profileData.personal.availability.regularHours).map(([day, hours]) => (
+                          hours.active && (
+                            <div key={day} className="flex items-center justify-between">
+                              <span className="capitalize">{day}</span>
+                              <span>{hours.start} - {hours.end}</span>
+                            </div>
+                          )
+                        ))}
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600">Projects Completed</div>
                   </div>
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {profileData.personal.successRate}%
-                    </div>
-                    <div className="text-sm text-gray-600">Success Rate</div>
+                </Card>
+
+                {/* Skills Section */}
+                <Card className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-xl font-semibold">Skills</h2>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleSkillsEdit}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <div className="bg-orange-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-orange-600">
-                      ${profileData.personal.hourlyRate}
-                    </div>
-                    <div className="text-sm text-gray-600">Hourly Rate</div>
+                  <div className="space-y-4">
+                    {profileData.skills.map((skill) => (
+                      <div key={skill.name} className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium text-gray-900">{skill.name}</span>
+                            <span className="text-blue-600 text-sm font-medium">
+                              {skill.endorsements} endorsements
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500">{skill.level}</span>
+                            <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                              <div 
+                                className="h-full bg-blue-600 rounded-full"
+                                style={{ 
+                                  width: skill.level === 'Expert' ? '100%' : 
+                                         skill.level === 'Advanced' ? '75%' : 
+                                         skill.level === 'Intermediate' ? '50%' : '25%'
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                </Card>
+
+                {/* Experience Section */}
+                <Card className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-xl font-semibold">Work Experience</h2>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleExperienceEdit}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-6">
+                    {profileData.experience.map((exp, index) => (
+                      <div key={index} className="border-l-2 border-gray-200 pl-4 py-2">
+                        <h3 className="font-medium text-gray-900">{exp.title}</h3>
+                        <p className="text-sm text-gray-600">{exp.company}</p>
+                        <p className="text-sm text-gray-500">{exp.period}</p>
+                        <p className="mt-2 text-gray-600">{exp.description}</p>
+                        <ul className="mt-2 space-y-1">
+                          {exp.achievements.map((achievement, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                              <Check className="w-4 h-4 text-green-500 mt-1" />
+                              <span>{achievement}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Portfolio Section */}
+                <Card className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-xl font-semibold">Portfolio</h2>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handlePortfolioEdit}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {profileData.portfolio.map((project, index) => (
+                      <div key={index} className="border rounded-xl overflow-hidden">
+                        <img
+                          src={project.image}
+                          alt={project.title}
+                          className="w-full h-48 object-cover"
+                        />
+                        <div className="p-4">
+                          <h3 className="font-medium text-lg mb-2">{project.title}</h3>
+                          <p className="text-gray-600 text-sm mb-4">{project.description}</p>
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {project.technologies.map((tech, i) => (
+                              <Badge key={i} className="bg-blue-50 text-blue-700">
+                                {tech}
+                              </Badge>
+                            ))}
+                          </div>
+                          <Button
+                            variant="outline"
+                            className="w-full flex items-center justify-center gap-2"
+                            onClick={() => window.open(project.link, '_blank')}
+                          >
+                            <Globe className="w-4 h-4" />
+                            View Project
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+
+              {/* Right Column */}
+              <div className="lg:w-1/3 space-y-6">
+                {/* Certifications Section */}
+                <Card className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-lg font-semibold">Certifications</h2>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleCertificationsEdit}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-4">
+                    {profileData.certifications.map((cert, index) => (
+                      <div key={index} className="border rounded-lg p-4">
+                        <h3 className="font-medium text-gray-900">{cert.name}</h3>
+                        <p className="text-sm text-gray-600">{cert.issuer}</p>
+                        <div className="flex justify-between items-center mt-2 text-sm text-gray-500">
+                          <span>Issued: {cert.date}</span>
+                          <span>Expires: {cert.expires}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Education Section */}
+                <Card className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-lg font-semibold">Education</h2>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleEducationEdit}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-4">
+                    {profileData.education.map((edu, index) => (
+                      <div key={index} className="border-l-2 border-gray-200 pl-4 py-2">
+                        <h3 className="font-medium text-gray-900">{edu.degree}</h3>
+                        <p className="text-sm text-gray-600">{edu.school}</p>
+                        <p className="text-sm text-gray-500">{edu.year}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            </div>
+          </div>
+
+          {/* Edit Modal */}
+          {showEditModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div className="relative max-h-[90vh] overflow-y-auto">
+                {renderModalContent()}
+              </div>
+            </div>
+          )}
+
+          {/* Delete Account Confirmation Modal */}
+          {showDeleteConfirm && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-lg max-w-md w-full p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete Account</h3>
+                <p className="text-gray-600 mb-6">
+                  Are you sure you want to delete your account? All of your data will be permanently removed.
+                  This action cannot be undone.
+                </p>
+                <div className="flex justify-end gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDeleteConfirm(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      // Handle account deletion
+                      setShowDeleteConfirm(false);
+                    }}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
             </div>
-          </Card>
-
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Left Column */}
-            <div className="lg:w-2/3 space-y-6">
-              {/* About Section */}
-              <Card className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold">About</h2>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handlePersonalInfoEdit}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                </div>
-                <p className="text-gray-600">{profileData.personal.bio}</p>
-              </Card>
-
-              {/* Availability Section */}
-              <Card className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold">Availability</h2>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleAvailabilityEdit}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-medium mb-2">Regular Hours</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Object.entries(profileData.personal.availability.regularHours).map(([day, hours]) => (
-                        hours.active && (
-                          <div key={day} className="flex items-center justify-between">
-                            <span className="capitalize">{day}</span>
-                            <span>{hours.start} - {hours.end}</span>
-                          </div>
-                        )
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Skills Section */}
-              <Card className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold">Skills</h2>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleSkillsEdit}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="space-y-4">
-                  {profileData.skills.map((skill) => (
-                    <div key={skill.name} className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-gray-900">{skill.name}</span>
-                          <span className="text-blue-600 text-sm font-medium">
-                            {skill.endorsements} endorsements
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-500">{skill.level}</span>
-                          <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                            <div 
-                              className="h-full bg-blue-600 rounded-full"
-                              style={{ 
-                                width: skill.level === 'Expert' ? '100%' : 
-                                       skill.level === 'Advanced' ? '75%' : 
-                                       skill.level === 'Intermediate' ? '50%' : '25%'
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Experience Section */}
-              <Card className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold">Work Experience</h2>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleExperienceEdit}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="space-y-6">
-                  {profileData.experience.map((exp, index) => (
-                    <div key={index} className="border-l-2 border-gray-200 pl-4 py-2">
-                      <h3 className="font-medium text-gray-900">{exp.title}</h3>
-                      <p className="text-sm text-gray-600">{exp.company}</p>
-                      <p className="text-sm text-gray-500">{exp.period}</p>
-                      <p className="mt-2 text-gray-600">{exp.description}</p>
-                      <ul className="mt-2 space-y-1">
-                        {exp.achievements.map((achievement, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                            <Check className="w-4 h-4 text-green-500 mt-1" />
-                            <span>{achievement}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Portfolio Section */}
-              <Card className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold">Portfolio</h2>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handlePortfolioEdit}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {profileData.portfolio.map((project, index) => (
-                    <div key={index} className="border rounded-xl overflow-hidden">
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="p-4">
-                        <h3 className="font-medium text-lg mb-2">{project.title}</h3>
-                        <p className="text-gray-600 text-sm mb-4">{project.description}</p>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {project.technologies.map((tech, i) => (
-                            <Badge key={i} className="bg-blue-50 text-blue-700">
-                              {tech}
-                            </Badge>
-                          ))}
-                        </div>
-                        <Button
-                          variant="outline"
-                          className="w-full flex items-center justify-center gap-2"
-                          onClick={() => window.open(project.link, '_blank')}
-                        >
-                          <Globe className="w-4 h-4" />
-                          View Project
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-
-            {/* Right Column */}
-            <div className="lg:w-1/3 space-y-6">
-              {/* Certifications Section */}
-              <Card className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-lg font-semibold">Certifications</h2>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleCertificationsEdit}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="space-y-4">
-                  {profileData.certifications.map((cert, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <h3 className="font-medium text-gray-900">{cert.name}</h3>
-                      <p className="text-sm text-gray-600">{cert.issuer}</p>
-                      <div className="flex justify-between items-center mt-2 text-sm text-gray-500">
-                        <span>Issued: {cert.date}</span>
-                        <span>Expires: {cert.expires}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Education Section */}
-              <Card className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-lg font-semibold">Education</h2>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleEducationEdit}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="space-y-4">
-                  {profileData.education.map((edu, index) => (
-                    <div key={index} className="border-l-2 border-gray-200 pl-4 py-2">
-                      <h3 className="font-medium text-gray-900">{edu.degree}</h3>
-                      <p className="text-sm text-gray-600">{edu.school}</p>
-                      <p className="text-sm text-gray-500">{edu.year}</p>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-          </div>
-        </div>
+          )}
+        </main>
       </div>
 
-      {/* Edit Modal */}
-      {/* Edit Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="relative max-h-[90vh] overflow-y-auto">
-            {renderModalContent()}
-          </div>
-        </div>
-      )}
+      <br /><br /><br /><br />
 
-      {/* Delete Account Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete Account</h3>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete your account? All of your data will be permanently removed.
-              This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteConfirm(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  // Handle account deletion
-                  setShowDeleteConfirm(false);
-                }}
-              >
-                Delete
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Footer */}
-      <div className="mt-20">
-        <SharedFooter2 />
-      </div>
+      <SharedFooter2 />
     </div>
   );
 };
