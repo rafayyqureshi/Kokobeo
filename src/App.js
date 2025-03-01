@@ -130,6 +130,7 @@ import RegionSettings from './Admin/INTERNATIONAL/RegionSettings';
 import LanguageManager from './Admin/INTERNATIONAL/LanguageManager';
 import CurrencySettings from './Admin/INTERNATIONAL/CurrencySettings';
 import CategoryForms from './Admin/FORM MANAGEMENT/CategoryForms';
+import ReportsPage from './client/reports';
 
 
 
@@ -152,7 +153,7 @@ function App() {
 
           <Route path="/projects"element={<ProjectsPage/>} />
 
-          <Route path="/internationalhompage"element={<ProHomepage/>} />
+          <Route path="/internationalhomepage"element={<ProHomepage/>} />
           <Route path="/plumberregistration"element={<PlumberRegistration/>} />
           <Route path="/plumberrequestform"element={<PlumberRequestForm/>} />
           <Route path="/lawyerRequestForm"element={<LawyerRequestForm/>} />
@@ -215,6 +216,7 @@ function App() {
           <Route path="/menu/contact"element={<ContactPage/>} />
           <Route path="/help"element={<HelpCenter/>} />
           <Route path="/client/profile"element={<ClientProfile/>} />
+          <Route path="/client/reports"element={<ReportsPage/>} />
           <Route path="/verify"element={<VerifyAccount/>} />
           <Route path="/plans"element={<SubscriptionPlans/>} />
           <Route path="/credits"element={<CreditsPage/>} />

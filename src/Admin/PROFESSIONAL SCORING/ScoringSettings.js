@@ -5,7 +5,8 @@ import {
   Award, CheckCircle, ArrowUpRight, Info, Plus,
   Edit, Trash2, X, Filter, Search, VideoIcon,
   Zap, BarChart2, TrendingUp, Database, FileCheck,
-  UserCheck, Store, PhoneCall, Calendar, ThumbsUp
+  UserCheck, Store, PhoneCall, Calendar, ThumbsUp,
+  Video, Lock
 } from 'lucide-react';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/Button';
@@ -16,6 +17,7 @@ const ScoringSettings = () => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedMetric, setSelectedMetric] = useState(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   // Sample scoring categories with enhanced evaluation metrics
   const scoringCategories = [
@@ -183,8 +185,22 @@ const ScoringSettings = () => {
     }
   ];
 
+  // Mock video access settings data
+  const [videoAccessSettings, setVideoAccessSettings] = useState({
+    minimumTurnover: [
+      { category: "Emergency Plumbing", threshold: 1000, enabled: true },
+      { category: "Lawyer", threshold: 5000, enabled: false }
+    ],
+    mandatoryRecording: [
+      { category: "Electrician", enabled: true, autoTrigger: false },
+      { professionalId: "PROF123", name: "John Doe", enabled: true, autoTrigger: true }
+    ],
+    autoTurnoverRule: { enabled: true, defaultThreshold: 1000 },
+    autoRecordingRule: { enabled: true, callsWithoutContract: 15 }
+  });
+
   const CategoryCard = ({ category }) => (
-    <Card className="p-6"   style={{ textAlign: 'left' }}>
+    <Card className="p-6" style={{ textAlign: 'left' }}>
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-blue-100 rounded-lg">
@@ -214,7 +230,7 @@ const ScoringSettings = () => {
       </div>
 
       {/* Metrics */}
-      <div className="mt-6 space-y-6"   style={{ textAlign: 'left' }}>
+      <div className="mt-6 space-y-6" style={{ textAlign: 'left' }}>
         {category.metrics.map((metric, index) => (
           <div key={index} className="space-y-3">
             <div className="flex justify-between items-center">
@@ -323,8 +339,219 @@ const ScoringSettings = () => {
     </Card>
   );
 
+  // Video Access Modal Component
+  const VideoAccessModal = ({ isOpen, onClose }) => {
+    const [minimumTurnover, setMinimumTurnover] = useState(videoAccessSettings.minimumTurnover);
+    const [mandatoryRecording, setMandatoryRecording] = useState(videoAccessSettings.mandatoryRecording);
+    const [autoTurnoverRule, setAutoTurnoverRule] = useState(videoAccessSettings.autoTurnoverRule);
+    const [autoRecordingRule, setAutoRecordingRule] = useState(videoAccessSettings.autoRecordingRule);
+
+    if (!isOpen) return null;
+
+    const handleSave = () => {
+      setVideoAccessSettings({
+        minimumTurnover,
+        mandatoryRecording,
+        autoTurnoverRule,
+        autoRecordingRule
+      });
+      onClose();
+    };
+
+    const addTurnoverRule = () => {
+      setMinimumTurnover([...minimumTurnover, { category: "", threshold: 0, enabled: false }]);
+    };
+
+    const addRecordingRule = () => {
+      setMandatoryRecording([...mandatoryRecording, { category: "", enabled: false, autoTrigger: false }]);
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b sticky top-0 bg-white">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Video Access Settings</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-6" style={{ textAlign: 'left' }}>
+            {/* Minimum Turnover for Video Access */}
+            <div>
+              <h3 className="font-medium mb-3">Minimum Turnover for Video Access</h3>
+              <div className="space-y-4">
+                {minimumTurnover.map((rule, index) => (
+                  <div key={index} className="p-4 bg-gray-50 rounded-lg flex items-center gap-4">
+                    <input
+                      type="text"
+                      placeholder="Category/Professional"
+                      value={rule.category || rule.name || ""}
+                      onChange={(e) => {
+                        const newRules = [...minimumTurnover];
+                        newRules[index] = { ...newRules[index], category: e.target.value };
+                        setMinimumTurnover(newRules);
+                      }}
+                      className="px-3 py-2 border rounded-lg flex-1"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Threshold ($)"
+                      value={rule.threshold}
+                      onChange={(e) => {
+                        const newRules = [...minimumTurnover];
+                        newRules[index] = { ...newRules[index], threshold: parseInt(e.target.value) || 0 };
+                        setMinimumTurnover(newRules);
+                      }}
+                      className="px-3 py-2 border rounded-lg w-32"
+                    />
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={rule.enabled}
+                        onChange={(e) => {
+                          const newRules = [...minimumTurnover];
+                          newRules[index] = { ...newRules[index], enabled: e.target.checked };
+                          setMinimumTurnover(newRules);
+                        }}
+                      />
+                      Enabled
+                    </label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-600"
+                      onClick={() => setMinimumTurnover(minimumTurnover.filter((_, i) => i !== index))}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button variant="outline" onClick={addTurnoverRule}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Rule
+                </Button>
+              </div>
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                <h4 className="font-medium mb-2">Automatic Turnover Rule</h4>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={autoTurnoverRule.enabled}
+                      onChange={(e) => setAutoTurnoverRule({ ...autoTurnoverRule, enabled: e.target.checked })}
+                    />
+                    Enabled
+                  </label>
+                  <input
+                    type="number"
+                    value={autoTurnoverRule.defaultThreshold}
+                    onChange={(e) => setAutoTurnoverRule({ ...autoTurnoverRule, defaultThreshold: parseInt(e.target.value) || 0 })}
+                    className="px-3 py-2 border rounded-lg w-32"
+                    placeholder="Default ($)"
+                  />
+                  <p className="text-sm text-gray-600">Default threshold for all categories</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Mandatory Video Call Recording */}
+            <div>
+              <h3 className="font-medium mb-3">Mandatory Video Call Recording</h3>
+              <div className="space-y-4">
+                {mandatoryRecording.map((rule, index) => (
+                  <div key={index} className="p-4 bg-gray-50 rounded-lg flex items-center gap-4">
+                    <input
+                      type="text"
+                      placeholder="Category/Professional ID"
+                      value={rule.category || rule.professionalId || ""}
+                      onChange={(e) => {
+                        const newRules = [...mandatoryRecording];
+                        newRules[index] = { ...newRules[index], [rule.professionalId ? 'professionalId' : 'category']: e.target.value };
+                        setMandatoryRecording(newRules);
+                      }}
+                      className="px-3 py-2 border rounded-lg flex-1"
+                    />
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={rule.enabled}
+                        onChange={(e) => {
+                          const newRules = [...mandatoryRecording];
+                          newRules[index] = { ...newRules[index], enabled: e.target.checked };
+                          setMandatoryRecording(newRules);
+                        }}
+                      />
+                      Mandatory
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={rule.autoTrigger}
+                        onChange={(e) => {
+                          const newRules = [...mandatoryRecording];
+                          newRules[index] = { ...newRules[index], autoTrigger: e.target.checked };
+                          setMandatoryRecording(newRules);
+                        }}
+                      />
+                      Auto-Trigger
+                    </label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-600"
+                      onClick={() => setMandatoryRecording(mandatoryRecording.filter((_, i) => i !== index))}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button variant="outline" onClick={addRecordingRule}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Rule
+                </Button>
+              </div>
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                <h4 className="font-medium mb-2">Automatic Recording Rule</h4>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={autoRecordingRule.enabled}
+                      onChange={(e) => setAutoRecordingRule({ ...autoRecordingRule, enabled: e.target.checked })}
+                    />
+                    Enabled
+                  </label>
+                  <input
+                    type="number"
+                    value={autoRecordingRule.callsWithoutContract}
+                    onChange={(e) => setAutoRecordingRule({ ...autoRecordingRule, callsWithoutContract: parseInt(e.target.value) || 0 })}
+                    className="px-3 py-2 border rounded-lg w-32"
+                    placeholder="Calls"
+                  />
+                  <p className="text-sm text-gray-600">Calls without contract before mandatory recording</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="pt-4 border-t flex justify-end gap-3">
+              <Button variant="outline" onClick={onClose}>Cancel</Button>
+              <Button onClick={handleSave}>Save Settings</Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50"   style={{ textAlign: 'left' }}>
+    <div className="min-h-screen bg-gray-50" style={{ textAlign: 'left' }}>
       <AdminHeader />
       
       <main className="lg:pl-64 pt-16">
@@ -418,120 +645,63 @@ const ScoringSettings = () => {
               </div>
             </div>
 
-            {/* Settings Modal */}
-            {showCategoryModal && (
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="p-6 border-b sticky top-0 bg-white">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold">Add Scoring Category</h2>
-                      <button
-                        onClick={() => setShowCategoryModal(false)}
-                        className="p-2 hover:bg-gray-100 rounded-full"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
+            {/* Video Access Settings */}
+            <Card className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-lg font-semibold">Video Access Settings</h2>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowVideoModal(true)}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Configure
+                </Button>
+              </div>
+              <div className="space-y-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Video className="h-5 w-5 text-gray-700" />
+                      <div>
+                        <h3 className="font-medium">Minimum Turnover for Video Access</h3>
+                        <p className="text-sm text-gray-500">Set turnover thresholds to enable video camera</p>
+                      </div>
                     </div>
+                    <Badge className={videoAccessSettings.autoTurnoverRule.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}>
+                      Auto: {videoAccessSettings.autoTurnoverRule.enabled ? `$${videoAccessSettings.autoTurnoverRule.defaultThreshold}` : 'Disabled'}
+                    </Badge>
                   </div>
-
-                  <div className="p-6 space-y-6">
-                    {/* Category Details */}
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Category Name</label>
-                        <input
-                          type="text"
-                          className="mt-1 block w-full px-3 py-2 border rounded-lg"
-                          placeholder="Enter category name"
-                        />
+                  <div className="mt-4 space-y-2">
+                    {videoAccessSettings.minimumTurnover.map((rule, index) => (
+                      <div key={index} className="text-sm text-gray-600">
+                        {rule.category || `Professional ${index + 1}`}: ${rule.threshold} {rule.enabled ? '(Enabled)' : '(Disabled)'}
                       </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Lock className="h-5 w-5 text-gray-700" />
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Weight (%)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          className="mt-1 block w-full px-3 py-2 border rounded-lg"
-                          placeholder="Enter weight percentage"
-                        />
+                        <h3 className="font-medium">Mandatory Video Call Recording</h3>
+                        <p className="text-sm text-gray-500">Require recording for specific categories or professionals</p>
                       </div>
                     </div>
-
-                    {/* Metrics */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium">Metrics</h3>
-                        <Button variant="outline" size="sm">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Metric
-                        </Button>
+                    <Badge className={videoAccessSettings.autoRecordingRule.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}>
+                      Auto: {videoAccessSettings.autoRecordingRule.enabled ? `${videoAccessSettings.autoRecordingRule.callsWithoutContract} calls` : 'Disabled'}
+                    </Badge>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    {videoAccessSettings.mandatoryRecording.map((rule, index) => (
+                      <div key={index} className="text-sm text-gray-600">
+                        {rule.category || rule.professionalId || `Rule ${index + 1}`}: {rule.enabled ? 'Mandatory' : 'Not Mandatory'} {rule.autoTrigger ? '(Auto-Trigger)' : ''}
                       </div>
-                      <div className="space-y-4">
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <div className="flex items-center justify-between mb-4">
-                            <input
-                              type="text"
-                              className="px-3 py-2 border rounded-lg"
-                              placeholder="Metric name"
-                            />
-                            <Button variant="ghost" size="sm" className="text-red-600">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          <div className="space-y-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">Point Value</label>
-                              <input
-                                type="number"
-                                className="mt-1 block w-full px-3 py-2 border rounded-lg"
-                                placeholder="Enter points"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">Conditions</label>
-                              <textarea
-                                className="mt-1 block w-full px-3 py-2 border rounded-lg"
-                                rows={3}
-                                placeholder="Enter conditions"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bonuses & Penalties */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <h3 className="font-medium mb-3">Bonuses</h3>
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Bonus
-                        </Button>
-                      </div>
-                      <div>
-                        <h3 className="font-medium mb-3">Penalties</h3>
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Penalty
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="pt-4 border-t flex justify-end gap-3">
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setShowCategoryModal(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button>Save Category</Button>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            )}
+            </Card>
 
             {/* Additional Settings */}
             <Card className="p-6">
@@ -574,6 +744,127 @@ const ScoringSettings = () => {
           </div>
         </div>
       </main>
+
+      {/* Category Modal */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b sticky top-0 bg-white">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Add Scoring Category</h2>
+                <button
+                  onClick={() => setShowCategoryModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Category Details */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Category Name</label>
+                  <input
+                    type="text"
+                    className="mt-1 block w-full px-3 py-2 border rounded-lg"
+                    placeholder="Enter category name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Weight (%)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    className="mt-1 block w-full px-3 py-2 border rounded-lg"
+                    placeholder="Enter weight percentage"
+                  />
+                </div>
+              </div>
+
+              {/* Metrics */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">Metrics</h3>
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Metric
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <input
+                        type="text"
+                        className="px-3 py-2 border rounded-lg"
+                        placeholder="Metric name"
+                      />
+                      <Button variant="ghost" size="sm" className="text-red-600">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Point Value</label>
+                        <input
+                          type="number"
+                          className="mt-1 block w-full px-3 py-2 border rounded-lg"
+                          placeholder="Enter points"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Conditions</label>
+                        <textarea
+                          className="mt-1 block w-full px-3 py-2 border rounded-lg"
+                          rows={3}
+                          placeholder="Enter conditions"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bonuses & Penalties */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-medium mb-3">Bonuses</h3>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Bonus
+                  </Button>
+                </div>
+                <div>
+                  <h3 className="font-medium mb-3">Penalties</h3>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Penalty
+                  </Button>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="pt-4 border-t flex justify-end gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowCategoryModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button>Save Category</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Access Modal */}
+      <VideoAccessModal
+        isOpen={showVideoModal}
+        onClose={() => setShowVideoModal(false)}
+      />
     </div>
   );
 };

@@ -533,7 +533,7 @@ const menuItems = [
   { icon: Briefcase, label: 'My Projects', href: '/international/client/myorders', badge: '2 Active' }
 ];
 
-// Complete mock international opportunities data
+// Complete mock international opportunities data with isPurchased property
 const internationalQuotes = [
   {
     id: 1,
@@ -564,7 +564,8 @@ const internationalQuotes = [
     ],
     rating: 4.8,
     reviewCount: 12,
-    reviews: mockReviews.filter(review => review.quoteId === 1)
+    reviews: mockReviews.filter(review => review.quoteId === 1),
+    isPurchased: true // Purchased
   },
   {
     id: 2,
@@ -595,7 +596,8 @@ const internationalQuotes = [
     ],
     rating: 4.6,
     reviewCount: 8,
-    reviews: mockReviews.filter(review => review.quoteId === 2)
+    reviews: mockReviews.filter(review => review.quoteId === 2),
+    isPurchased: false // Not purchased
   },
   {
     id: 3,
@@ -626,7 +628,8 @@ const internationalQuotes = [
     ],
     rating: 4.9,
     reviewCount: 15,
-    reviews: mockReviews.filter(review => review.quoteId === 3)
+    reviews: mockReviews.filter(review => review.quoteId === 3),
+    isPurchased: true // Purchased
   },
   {
     id: 4,
@@ -657,7 +660,8 @@ const internationalQuotes = [
     ],
     rating: 4.7,
     reviewCount: 9,
-    reviews: []
+    reviews: [],
+    isPurchased: false // Not purchased
   },
   {
     id: 5,
@@ -688,7 +692,8 @@ const internationalQuotes = [
     ],
     rating: 4.5,
     reviewCount: 7,
-    reviews: []
+    reviews: [],
+    isPurchased: true // Purchased
   },
   {
     id: 6,
@@ -719,7 +724,8 @@ const internationalQuotes = [
     ],
     rating: 4.4,
     reviewCount: 6,
-    reviews: []
+    reviews: [],
+    isPurchased: false // Not purchased
   }
 ];
 
@@ -1340,7 +1346,7 @@ const InternationalProfessional = () => {
     );
   };
 
-  // Quote Card Component
+  // Quote Card Component with Add Review button
   const renderQuoteCard = (quote) => (
     <Card 
       key={quote.id}
@@ -1381,7 +1387,7 @@ const InternationalProfessional = () => {
           <p className="text-gray-600 mt-1">
             {quote.description}
           </p>
-          {/* Rating Display */}
+          {/* Rating Display with Add Review */}
           <div className="flex items-center mt-2 space-x-1">
             <div className="flex">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -1408,6 +1414,19 @@ const InternationalProfessional = () => {
             >
               View All
             </Button>
+            {/* New Add Review Button */}
+            {quote.isPurchased && (
+              <Button 
+                variant="link" 
+                className="text-blue-600 text-sm"
+                onClick={() => {
+                  setSelectedQuoteForReview(quote);
+                  setShowReviewModal(true);
+                }}
+              >
+                Add Review
+              </Button>
+            )}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {quote.languages.map((language, index) => (

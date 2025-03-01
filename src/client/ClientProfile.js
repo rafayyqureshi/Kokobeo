@@ -7,24 +7,25 @@ import {
   Settings, Check, Camera, Building, PenToolIcon, Home,
   CheckCircle, Heart, RefreshCw, Download, Search, ChevronRight,
   AlertCircle, CheckSquare, BriefcaseIcon, Users, Wrench,
-  ChartAreaIcon, Menu, Bell
+  ChartAreaIcon, Menu, Bell, LockIcon
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/badge';
 import { Card } from '../components/ui/card';
 import SharedHeader5 from '../Headers/SharedHeader5';
 import SharedFooter2 from '../Footer/SharedFooter2';
-import ProfileImageSection from '../components/ui/ProfileImageSection'; 
+import ProfileImageSection from '../components/ui/ProfileImageSection';
 
 const ClientProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isAdminEditMode, setIsAdminEditMode] = useState(false); // New state for admin edit mode
   const [selectedTab, setSelectedTab] = useState('overview');
   const [showContactInfo, setShowContactInfo] = useState(false);
   const [reviewType, setReviewType] = useState('professional');
-  const [editedBio, setEditedBio] = useState('');
+  const [editedProfile, setEditedProfile] = useState(null); // New state for edited profile data
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Sidebar items (added for client view)
+  // Sidebar items
   const sidebarItems = [
     { icon: <Home className="h-5 w-5" />, label: "Dashboard", href: "/clients" },
     { icon: <MessageSquare className="h-5 w-5" />, label: "Messages", href: "/client/messageandvideocall" },
@@ -34,6 +35,7 @@ const ClientProfile = () => {
     { icon: <DollarSign className="h-5 w-5" />, label: "Wallet", href: "/client/Wallet" },
     { icon: <Bell className="h-5 w-5" />, label: "Notifications", href: "/client/myoffers" },
     { icon: <User className="h-5 w-5" />, label: "Profile", href: "/client/profile", active: true },
+    { icon: <User className="h-5 w-5" />, label: "Report", href: "/client/reports" },
     { icon: <Settings className="h-5 w-5" />, label: "Settings", href: "/client/profilesettings" }
   ];
 
@@ -359,18 +361,59 @@ const ClientProfile = () => {
     ]
   });
 
+  // Initialize editedProfile when starting to edit
+  const startEditing = () => {
+    setEditedProfile({ ...profileData.personal });
+    setIsEditing(true);
+  };
+
   // Handle save changes
   const handleSaveChanges = () => {
     setProfileData(prev => ({
       ...prev,
-      personal: {
-        ...prev.personal,
-        bio: editedBio
-      }
+      personal: { ...editedProfile }
     }));
     setIsEditing(false);
+    setEditedProfile(null);
+    if (isAdminEditMode) {
+      console.log("Admin edits saved:", editedProfile);
+      // Here you would typically send the edits to a backend API for admin approval
+    }
   };
 
+  // Handle cancel changes
+  const handleCancelEdit = () => {
+    setEditedProfile(null);
+    setIsEditing(false);
+    setIsAdminEditMode(false);
+  };
+
+  // Handle profile field changes
+  const handleFieldChange = (field, value) => {
+    setEditedProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Handle nested company field changes
+  const handleCompanyFieldChange = (companyField, value) => {
+    setEditedProfile(prev => ({
+      ...prev,
+      company: {
+        ...prev.company,
+        [companyField]: value
+      }
+    }));
+  };
+
+  // Toggle admin edit mode (mock for demonstration)
+  const toggleAdminEditMode = () => {
+    setIsAdminEditMode(prev => !prev);
+    if (!isEditing) startEditing();
+  };
+
+  // Handle profile image change (unchanged from original)
   const handleProfileImageChange = (imageUrl, file) => {
     setProfileData(prev => ({
       ...prev,
@@ -380,18 +423,6 @@ const ClientProfile = () => {
       }
     }));
     console.log('File to upload:', file);
-  };
-
-  // Handle cancel changes
-  const handleCancelEdit = () => {
-    setEditedBio(profileData.personal.bio);
-    setIsEditing(false);
-  };
-
-  // Initialize editedBio when starting to edit
-  const startEditing = () => {
-    setEditedBio(profileData.personal.bio);
-    setIsEditing(true);
   };
 
   return (
@@ -478,9 +509,8 @@ const ClientProfile = () => {
 
         {/* Main Content */}
         <main className="flex-1 lg:pl-64">
-          {/* Desktop Hero Section - Hidden on mobile */}
+          {/* Desktop Hero Section */}
           <div className="hidden sm:block relative h-64 md:h-80">
-            {/* Cover Photo */}
             <div 
               className="absolute inset-0 bg-cover bg-center"
               style={{ 
@@ -491,12 +521,9 @@ const ClientProfile = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70"></div>
             
-            {/* Desktop Profile Content */}
             <div className="absolute bottom-0 left-0 right-0 px-6 lg:px-8 pb-6">
               <div className="max-w-6xl mx-auto flex items-end justify-between">
-                {/* Profile Info with Image */}
                 <div className="flex items-end gap-6">
-                  {/* Profile Image */}
                   <div className="relative -mb-2">
                     <div className="h-24 w-24 md:h-28 md:w-28 rounded-full overflow-hidden border-4 border-white bg-white">
                       <img 
@@ -506,8 +533,6 @@ const ClientProfile = () => {
                       />
                     </div>
                   </div>
-                  
-                  {/* Name, Title, Location */}
                   <div className="text-white pb-1">
                     <h1 className="text-2xl md:text-3xl font-bold">{profileData.personal.name}</h1>
                     <p className="text-xl text-gray-200">{profileData.personal.title}</p>
@@ -524,11 +549,9 @@ const ClientProfile = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Action Buttons */}
                 <div className="flex gap-3">
                   <Button 
-                    onClick={() => window.location.href = 'https://kokobeo.com/client/profilesettings'}
+                    onClick={startEditing}
                     variant="outline" 
                     className="bg-black/20 border-white/20 hover:bg-black/40 text-black"
                   >
@@ -538,15 +561,27 @@ const ClientProfile = () => {
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                     <MessageSquare className="w-4 h-4 mr-2" />
                     Contact
+                  </Button>{" "}
+                  {/* Mock admin toggle button */}
+                  <Button
+                    onClick={toggleAdminEditMode}
+                    variant="outline"
+                    className={`${
+                      isAdminEditMode
+                        ? 'bg-red-600/20 border-red-600/20 hover:bg-red-600/40 text-white'
+                        : 'bg-white/20 border-white/20 hover:bg-white/40 text-white'
+                    }`}
+                  >
+                    <LockIcon className="w-4 h-4 mr-2" />
+                    {isAdminEditMode ? 'Exit Admin Mode' : 'Admin Edit'}
                   </Button>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Mobile Hero Section - Hidden on desktop */}
+          {/* Mobile Hero Section */}
           <div className="sm:hidden">
-            {/* Cover Photo with name and title */}
             <div 
               className="relative h-72 bg-cover bg-center"
               style={{ 
@@ -556,15 +591,11 @@ const ClientProfile = () => {
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black/70"></div>
-              
-              {/* Centered name and title */}
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
                 <h1 className="text-2xl font-bold text-white mb-1">{profileData.personal.name}</h1>
                 <p className="text-lg text-white">{profileData.personal.title}</p>
               </div>
             </div>
-            
-            {/* Profile picture positioned at the bottom of cover photo */}
             <div className="relative -mt-16 mb-8 flex justify-center">
               <div className="h-28 w-28 rounded-full overflow-hidden border-4 border-white bg-white">
                 <img 
@@ -574,8 +605,6 @@ const ClientProfile = () => {
                 />
               </div>
             </div>
-            
-            {/* Location and company details */}
             <div className="px-4 mb-6">
               <div className="flex items-center justify-center gap-2 mb-1 text-gray-700">
                 <MapPin className="w-5 h-5 text-gray-500" />
@@ -586,8 +615,6 @@ const ClientProfile = () => {
                 <span>{profileData.personal.company.name}</span>
               </div>
             </div>
-            
-            {/* Action Buttons */}
             <div className="px-4 space-y-3 mb-8">
               <Button 
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 flex items-center justify-center"
@@ -596,18 +623,39 @@ const ClientProfile = () => {
                 Contact
               </Button>
               <Button 
-                onClick={() => window.location.href = 'https://kokobeo.com/client/profilesettings'}
+                onClick={startEditing}
                 variant="outline" 
                 className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 py-3 flex items-center justify-center"
               >
                 <Edit className="w-5 h-5 mr-2" />
                 Edit Profile
               </Button>
+              {/* Mock admin toggle button for mobile */}
+              <Button
+                onClick={toggleAdminEditMode}
+                variant="outline"
+                className={`w-full py-3 flex items-center justify-center ${
+                  isAdminEditMode
+                    ? 'border-red-600 text-red-600 hover:bg-red-50'
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <LockIcon className="w-5 h-5 mr-2" />
+                {isAdminEditMode ? 'Exit Admin Mode' : 'Admin Edit'}
+              </Button>
             </div>
           </div>
 
           {/* Main Content */}
           <div className="max-w-6xl mx-auto py-6 px-4 sm:px-6">
+            {/* Admin Edit Mode Indicator */}
+            {isAdminEditMode && (
+              <div className="mb-4 p-4 bg-red-50 rounded-lg flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+                <p className="text-sm text-red-700">Admin Edit Mode Active - Changes override client settings</p>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-white">
                 <div className="flex items-center justify-between mb-4">
@@ -686,7 +734,7 @@ const ClientProfile = () => {
               </Card>
             </div>
 
-            {/* Mobile-Optimized Tabs */}
+            {/* Tabs */}
             <div className="mb-8 border-b overflow-x-auto">
               <div className="flex whitespace-nowrap gap-4 sm:gap-6 px-2">
                 {[
@@ -725,15 +773,57 @@ const ClientProfile = () => {
                   <>
                     {/* About Section with Edit Functionality */}
                     <Card className="p-4 sm:p-6">
-                      <h2 className="text-lg sm:text-xl font-semibold mb-4">About</h2>
+                      <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center justify-between">
+                        About
+                        {!isEditing && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={startEditing}
+                            className="text-blue-600 hover:text-blue-700"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </h2>
                       {isEditing ? (
                         <div className="space-y-4">
-                          <textarea
-                            value={editedBio}
-                            onChange={(e) => setEditedBio(e.target.value)}
-                            className="w-full p-3 border rounded-lg min-h-[120px] sm:min-h-[150px] focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
-                            placeholder="Tell professionals about your project needsand preferences..."
-                          />
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                            <input
+                              type="text"
+                              value={editedProfile.name}
+                              onChange={(e) => handleFieldChange('name', e.target.value)}
+                              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input
+                              type="text"
+                              value={editedProfile.title}
+                              onChange={(e) => handleFieldChange('title', e.target.value)}
+                              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                            <textarea
+                              value={editedProfile.bio}
+                              onChange={(e) => handleFieldChange('bio', e.target.value)}
+                              className="w-full p-3 border rounded-lg min-h-[120px] sm:min-h-[150px] focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                              placeholder="Tell professionals about your project needs and preferences..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                            <input
+                              type="text"
+                              value={editedProfile.location}
+                              onChange={(e) => handleFieldChange('location', e.target.value)}
+                              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                            />
+                          </div>
                           <div className="flex justify-end gap-2">
                             <Button
                               variant="outline"
@@ -756,36 +846,95 @@ const ClientProfile = () => {
                         </p>
                       )}
                     </Card>
+
                     {/* Company Information */}
                     <Card className="p-4 sm:p-6">
                       <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2">
                         <Building className="h-5 w-5 text-blue-600" />
                         Company Information
                       </h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                        <div>
-                          <h3 className="font-medium text-gray-900 mb-1 text-sm sm:text-base">
-                            {profileData.personal.company.name}
-                          </h3>
-                          <p className="text-gray-600 text-sm sm:text-base">
-                            {profileData.personal.company.description}
-                          </p>
+                      {isEditing ? (
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                            <input
+                              type="text"
+                              value={editedProfile.company.name}
+                              onChange={(e) => handleCompanyFieldChange('name', e.target.value)}
+                              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                            <input
+                              type="text"
+                              value={editedProfile.company.industry}
+                              onChange={(e) => handleCompanyFieldChange('industry', e.target.value)}
+                              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                            <input
+                              type="text"
+                              value={editedProfile.company.size}
+                              onChange={(e) => handleCompanyFieldChange('size', e.target.value)}
+                              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Founded</label>
+                            <input
+                              type="text"
+                              value={editedProfile.company.founded}
+                              onChange={(e) => handleCompanyFieldChange('founded', e.target.value)}
+                              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                            <input
+                              type="text"
+                              value={editedProfile.company.website}
+                              onChange={(e) => handleCompanyFieldChange('website', e.target.value)}
+                              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea
+                              value={editedProfile.company.description}
+                              onChange={(e) => handleCompanyFieldChange('description', e.target.value)}
+                              className="w-full p-3 border rounded-lg min-h-[100px] focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                            />
+                          </div>
                         </div>
-                        <div className="space-y-2 text-sm sm:text-base">
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Industry:</span>
-                            <span className="font-medium">{profileData.personal.company.industry}</span>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                          <div>
+                            <h3 className="font-medium text-gray-900 mb-1 text-sm sm:text-base">
+                              {profileData.personal.company.name}
+                            </h3>
+                            <p className="text-gray-600 text-sm sm:text-base">
+                              {profileData.personal.company.description}
+                            </p>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Company Size:</span>
-                            <span className="font-medium">{profileData.personal.company.size}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-500">Founded:</span>
-                            <span className="font-medium">{profileData.personal.company.founded}</span>
+                          <div className="space-y-2 text-sm sm:text-base">
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Industry:</span>
+                              <span className="font-medium">{profileData.personal.company.industry}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Company Size:</span>
+                              <span className="font-medium">{profileData.personal.company.size}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Founded:</span>
+                              <span className="font-medium">{profileData.personal.company.founded}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </Card>
 
                     {/* Expertise & Requirements */}
@@ -795,7 +944,6 @@ const ClientProfile = () => {
                         Project Preferences
                       </h2>
                       <div className="space-y-4 sm:space-y-6">
-                        {/* Project Types */}
                         <div>
                           <h3 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">Project Types</h3>
                           <div className="flex flex-wrap gap-2">
@@ -806,8 +954,6 @@ const ClientProfile = () => {
                             ))}
                           </div>
                         </div>
-
-                        {/* Industry Focus */}
                         <div>
                           <h3 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">Industry Focus</h3>
                           <div className="flex flex-wrap gap-2">
@@ -818,8 +964,6 @@ const ClientProfile = () => {
                             ))}
                           </div>
                         </div>
-
-                        {/* Required Expertise */}
                         <div>
                           <h3 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">Required Expertise</h3>
                           <div className="flex flex-wrap gap-2">
@@ -856,90 +1000,6 @@ const ClientProfile = () => {
                   </>
                 )}
 
-                {selectedTab === 'projects' && (
-                  <Card className="p-4 sm:p-6">
-                    {profileData.activeProjects.map((project) => (
-                      <div key={project.id} className="border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 last:mb-0">
-                        <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
-                          <div>
-                            <h3 className="text-lg sm:text-xl font-medium text-gray-900">{project.title}</h3>
-                            <p className="text-xs sm:text-sm text-gray-500">Started {project.startDate}</p>
-                          </div>
-                          <Badge className="bg-blue-100 text-blue-800 mt-2 sm:mt-0">
-                            In Progress
-                          </Badge>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="mb-4 sm:mb-6">
-                          <div className="flex justify-between text-xs sm:text-sm mb-1">
-                            <span>Project Progress</span>
-                            <span>{project.completion}%</span>
-                          </div>
-                          <div className="w-full h-2 bg-gray-200 rounded-full">
-                            <div 
-                              className="h-full bg-blue-600 rounded-full"
-                              style={{ width: `${project.completion}%` }}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Project Details */}
-                        <div className="grid grid-cols-2 gap-4 mb-4 sm:mb-6 text-xs sm:text-sm">
-                          <div>
-                            <p className="text-gray-500">Budget</p>
-                            <p className="font-medium">${project.budget}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Timeline</p>
-                            <p className="font-medium">{project.timeline}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Due Date</p>
-                            <p className="font-medium">{project.dueDate}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Next Milestone</p>
-                            <p className="font-medium">{project.nextMilestone}</p>
-                          </div>
-                        </div>
-
-                        {/* Team */}
-                        <div className="mb-4 sm:mb-6">
-                          <h4 className="font-medium mb-2 text-sm sm:text-base">Project Team</h4>
-                          <div className="flex flex-wrap gap-4">
-                            {project.team.map((member) => (
-                              <div key={member.name} className="flex items-center gap-2">
-                                <img 
-                                  src={member.photo} 
-                                  alt={member.name}
-                                  className="w-8 h-8 rounded-full"
-                                />
-                                <div>
-                                  <p className="text-xs sm:text-sm font-medium">{member.name}</p>
-                                  <p className="text-xs text-gray-500">{member.role}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Technologies */}
-                        <div>
-                          <h4 className="font-medium mb-2 text-sm sm:text-base">Technologies</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {project.technologies.map((tech) => (
-                              <Badge key={tech} variant="secondary" className="text-xs sm:text-sm">
-                                {tech}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </Card>
-                )}
-
                 {selectedTab === 'local-services' && (
                   <>
                     {/* Emergency Services Section */}
@@ -960,7 +1020,7 @@ const ClientProfile = () => {
                                 {provider.responseTime}
                               </Badge>
                             </div>
-                            <div className="mt-2 flex flex-wrap gap-4 text-xs sm:text-sm">
+                            <div className="mt-2 flex flex-wrap gap-4 text-xs sm:text-sm text-gray-600">
                               <div className="flex items-center gap-1">
                                 <Star className="w-4 h-4 text-yellow-400 fill-current" />
                                 <span>{provider.rating}</span>
@@ -1055,9 +1115,92 @@ const ClientProfile = () => {
                   </>
                 )}
 
+                {selectedTab === 'projects' && (
+                  <Card className="p-4 sm:p-6">
+                    {profileData.activeProjects.map((project) => (
+                      <div key={project.id} className="border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 last:mb-0">
+                        <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-lg sm:text-xl font-medium text-gray-900">{project.title}</h3>
+                            <p className="text-xs sm:text-sm text-gray-500">Started {project.startDate}</p>
+                          </div>
+                          <Badge className="bg-blue-100 text-blue-800 mt-2 sm:mt-0">
+                            In Progress
+                          </Badge>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="mb-4 sm:mb-6">
+                          <div className="flex justify-between text-xs sm:text-sm mb-1">
+                            <span>Project Progress</span>
+                            <span>{project.completion}%</span>
+                          </div>
+                          <div className="w-full h-2 bg-gray-200 rounded-full">
+                            <div 
+                              className="h-full bg-blue-600 rounded-full"
+                              style={{ width: `${project.completion}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Project Details */}
+                        <div className="grid grid-cols-2 gap-4 mb-4 sm:mb-6 text-xs sm:text-sm">
+                          <div>
+                            <p className="text-gray-500">Budget</p>
+                            <p className="font-medium">${project.budget}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500">Timeline</p>
+                            <p className="font-medium">{project.timeline}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500">Due Date</p>
+                            <p className="font-medium">{project.dueDate}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500">Next Milestone</p>
+                            <p className="font-medium">{project.nextMilestone}</p>
+                          </div>
+                        </div>
+
+                        {/* Team */}
+                        <div className="mb-4 sm:mb-6">
+                          <h4 className="font-medium mb-2 text-sm sm:text-base">Project Team</h4>
+                          <div className="flex flex-wrap gap-4">
+                            {project.team.map((member) => (
+                              <div key={member.name} className="flex items-center gap-2">
+                                <img 
+                                  src={member.photo} 
+                                  alt={member.name}
+                                  className="w-8 h-8 rounded-full"
+                                />
+                                <div>
+                                  <p className="text-xs sm:text-sm font-medium">{member.name}</p>
+                                  <p className="text-xs text-gray-500">{member.role}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Technologies */}
+                        <div>
+                          <h4 className="font-medium mb-2 text-sm sm:text-base">Technologies</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {project.technologies.map((tech) => (
+                              <Badge key={tech} variant="secondary" className="text-xs sm:text-sm">
+                                {tech}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </Card>
+                )}
+
                 {selectedTab === 'reviews' && (
                   <Card className="p-4 sm:p-6">
-                    {/* Reviews Type Selector */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
                       <h2 className="text-lg sm:text-xl font-semibold">Reviews</h2>
                       <div className="flex gap-2 w-full sm:w-auto">
@@ -1079,7 +1222,6 @@ const ClientProfile = () => {
                     </div>
 
                     <div className="space-y-4 sm:space-y-6">
-                      {/* Professional Reviews */}
                       {reviewType === 'professional' && profileData.reviews.professional.map((review) => (
                         <div key={review.id} className="border rounded-lg p-4 sm:p-6">
                           <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-2">
@@ -1121,7 +1263,6 @@ const ClientProfile = () => {
                         </div>
                       ))}
 
-                      {/* Local Service Reviews */}
                       {reviewType === 'local' && profileData.reviews.local.map((review) => (
                         <div key={review.id} className="border rounded-lg p-4 sm:p-6">
                           <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-2">
@@ -1192,7 +1333,7 @@ const ClientProfile = () => {
                           <div>
                             <h3 className="font-medium text-gray-900 text-sm sm:text-base">{step}</h3>
                             <p className="text-xs sm:text-sm text-gray-600">
-                              {/* Add descriptions for each step */}
+                              {/* Add descriptions for each step if needed */}
                             </p>
                           </div>
                         </div>
@@ -1207,20 +1348,43 @@ const ClientProfile = () => {
                 {/* Contact Information */}
                 <Card className="p-4 sm:p-6">
                   <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
-                  <div className="space-y-4 text-sm sm:text-base">
-                    <div className="flex items-center gap-3">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      <span>{profileData.personal.email}</span>
+                  {isEditing ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input
+                          type="email"
+                          value={editedProfile.email}
+                          onChange={(e) => handleFieldChange('email', e.target.value)}
+                          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input
+                          type="tel"
+                          value={editedProfile.phone}
+                          onChange={(e) => handleFieldChange('phone', e.target.value)}
+                          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <span>{profileData.personal.phone}</span>
+                  ) : (
+                    <div className="space-y-4 text-sm sm:text-base">
+                      <div className="flex items-center gap-3">
+                        <Mail className="w-4 h-4 text-gray-400" />
+                        <span>{profileData.personal.email}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Phone className="w-4 h-4 text-gray-400" />
+                        <span>{profileData.personal.phone}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Globe className="w-4 h-4 text-gray-400" />
+                        <span>{profileData.personal.company.website}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Globe className="w-4 h-4 text-gray-400" />
-                      <span>{profileData.personal.company.website}</span>
-                    </div>
-                  </div>
+                  )}
                   <div className="mt-4 pt-4 border-t">
                     <h3 className="text-sm font-medium mb-2">Social Profiles</h3>
                     <div className="space-y-2 text-sm">
@@ -1244,10 +1408,7 @@ const ClientProfile = () => {
           </div>
         </main>
       </div>
-      <br></br>
-      <br></br>
-      <br></br>
-
+      <br /><br /><br /><br />
       <SharedFooter2 />
     </div>
   );

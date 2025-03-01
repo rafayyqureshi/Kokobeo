@@ -369,6 +369,10 @@ const ServiceCard = ({ professional, selectedType, onMessage, onContact }) => {
             <span className="ml-2 font-medium">{professional.price}</span>
           </div>
           <div>
+            <span className="text-gray-500">Outing Cost:</span>
+            <span className="ml-2 font-medium">{professional.outingCost || "N/A"}</span>
+          </div>
+          <div>
             <span className="text-gray-500">Available:</span>
             <span className="ml-2 font-medium">{professional.availability}</span>
           </div>
@@ -652,7 +656,8 @@ const ServicePage = ({ service, onClose }) => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Price Range
                   </label>
-                  <select value={priceRange}
+                  <select
+                    value={priceRange}
                     onChange={(e) => setPriceRange(e.target.value)}
                     className="w-full rounded-lg border-gray-300 shadow-sm"
                   >
@@ -797,7 +802,7 @@ const KokobeoHomepage = () => {
   const [showReviews, setShowReviews] = useState(false);
   const [showHiring, setShowHiring] = useState(false);
   const [showQuotes, setShowQuotes] = useState(false);
-  const [showEmergency, setShowEmergency] = useState(false);
+  const [showEmergency, setShowEmergency] = useState(false); // New state for Emergency Services popup
   const [showChat, setShowChat] = useState(null);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
@@ -850,7 +855,6 @@ const KokobeoHomepage = () => {
     }
   ];
 
-  // Updated Menu items configuration with My Profile
   const menuItems = [
     { icon: Globe, text: "About Kokobeo", href: "/about" },
     { icon: Info, text: "How it Works", href: "/how-it-works" },
@@ -858,7 +862,7 @@ const KokobeoHomepage = () => {
     { icon: Mail, text: "Contact Us", href: "/menu/contact" },
     { icon: HelpCircle, text: "Help Center", href: "/help" },
     { icon: Users, text: "Invite Friends", href: "/invite" },
-    { icon: User, text: "My Profile", onClick: () => setShowLoginPopup(true) } // Added My Profile with popup trigger
+    { icon: User, text: "My Profile", onClick: () => setShowLoginPopup(true) }
   ];
 
   const features = [
@@ -1042,7 +1046,7 @@ const KokobeoHomepage = () => {
         </div>
       </main>
 
-      {/* New Footer */}
+      {/* Updated Footer */}
       <div className="fixed bottom-0 w-full bg-white border-t z-30">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
           {/* Mobile Footer */}
@@ -1084,11 +1088,19 @@ const KokobeoHomepage = () => {
                 Reviews
               </button>
               <button 
+                onClick={() => setShowEmergency(true)} // New Emergency Services button
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                Emergency
+              </button>
+              <button 
                 onClick={() => setShowPrivacyModal(true)}
                 className="text-xs text-gray-600 hover:text-gray-900"
               >
                 Privacy
               </button>
+            </div>
+            <div className="grid grid-cols-1 mt-2">
               <button 
                 onClick={() => setShowTermsModal(true)}
                 className="text-xs text-gray-600 hover:text-gray-900"
@@ -1131,6 +1143,12 @@ const KokobeoHomepage = () => {
                 className="text-gray-600 hover:text-gray-900 whitespace-nowrap ml-4"
               >
                 Reviews
+              </button>
+              <button 
+                onClick={() => setShowEmergency(true)} // New Emergency Services button
+                className="text-gray-600 hover:text-gray-900 whitespace-nowrap ml-4"
+              >
+                Emergency Services
               </button>
               <button 
                 onClick={() => setShowPrivacyModal(true)}
@@ -1220,6 +1238,24 @@ const KokobeoHomepage = () => {
               <li>Share detailed feedback</li>
               <li>Help others make informed decisions</li>
               <li>Build trust in our community</li>
+            </ul>
+          </div>
+        }
+      />
+
+      {/* New Emergency Services Popup */}
+      <InfoPopup
+        isOpen={showEmergency}
+        onClose={() => setShowEmergency(false)}
+        title="Emergency Services"
+        content={
+          <div className="space-y-4 text-left">
+            <p>Get immediate help with our 24/7 emergency services:</p>
+            <ul className="list-disc pl-4">
+              <li>Find professionals available round-the-clock</li>
+              <li>Quick response for urgent needs</li>
+              <li>Contact verified experts directly</li>
+              <li>Resolve emergencies efficiently</li>
             </ul>
           </div>
         }

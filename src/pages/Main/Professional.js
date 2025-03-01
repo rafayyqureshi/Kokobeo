@@ -76,7 +76,7 @@ const mockReviews = [
   }
 ];
 
-// Mock quotes data (6 quotes)
+// Mock quotes data (6 quotes) with isPurchased property added
 const quotes = Array(6).fill(null).map((_, index) => ({
   id: index + 1,
   type: index % 2 === 0 ? 'emergency' : 'standard',
@@ -100,7 +100,8 @@ const quotes = Array(6).fill(null).map((_, index) => ({
   hiring: true,
   status: 'New',
   rating: index % 2 === 0 ? 4.5 : 4.8,
-  reviewCount: index % 2 === 0 ? 2 : 1
+  reviewCount: index % 2 === 0 ? 2 : 1,
+  isPurchased: index % 2 === 0 // Mock condition: even IDs are purchased
 }));
 
 const ProfessionalDashboard = () => {
@@ -121,11 +122,11 @@ const ProfessionalDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-  const [showChat, setShowChat] = useState(null); // Changed to track quote-specific chat
+  const [showChat, setShowChat] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showReviewsList, setShowReviewsList] = useState(null); // Changed to track quote-specific reviews
-  const [reviewSortBy, setReviewSortBy] = useState('recent'); // Added for review filtering
-  const [showLoginPopup, setShowLoginPopup] = useState(false); // Added for login/registration popup
+  const [showReviewsList, setShowReviewsList] = useState(null);
+  const [reviewSortBy, setReviewSortBy] = useState('recent');
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   // Menu items with notifications included
   const menuItems = [
@@ -518,6 +519,16 @@ const ProfessionalDashboard = () => {
             >
               View All
             </Button>
+            {/* New Add Review Button */}
+            {quote.isPurchased && (
+              <Button 
+                variant="link" 
+                className="text-blue-600 text-sm"
+                onClick={() => setShowReviewModal(true)}
+              >
+                Add Review
+              </Button>
+            )}
           </div>
         </div>
 
@@ -579,13 +590,13 @@ const ProfessionalDashboard = () => {
               >
                 Respond Now
               </Button>
-              <Button
+              {/* <Button
                 variant="outline"
                 className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
                 onClick={() => setShowChat(quote.id)}
               >
                 Chat Now
-              </Button>
+              </Button> */}
             </>
           ) : (
             <Button 

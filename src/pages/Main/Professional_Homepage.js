@@ -980,6 +980,7 @@ const ProHomepage = () => {
   const [showReviews, setShowReviews] = useState(false);
   const [showHiring, setShowHiring] = useState(false);
   const [showQuotes, setShowQuotes] = useState(false);
+  const [showEmergency, setShowEmergency] = useState(false); // New state for Emergency Services popup
   const [selectedProfessional, setSelectedProfessional] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showReviewsList, setShowReviewsList] = useState(false);
@@ -1127,7 +1128,131 @@ const ProHomepage = () => {
         </div>
       </main>
 
-      <SharedFooter2 />
+      {/* Updated Footer */}
+      <div className="fixed bottom-0 w-full bg-white border-t z-30">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
+          {/* Mobile Footer */}
+          <div className="flex flex-col sm:hidden">
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center">
+                <Globe className="h-4 w-4 text-gray-500 mr-2" />
+                <span className="text-xs text-gray-600">Loading location...</span>
+              </div>
+              <div className="text-xs text-gray-600">
+                Kokobeo Inc.
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <button 
+                onClick={() => setShowHowItWorks(true)}
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                How it works
+              </button>
+              <button 
+                onClick={() => setShowHiring(true)}
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                Hire Pro
+              </button>
+              <button 
+                onClick={() => setShowQuotes(true)}
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                Get quotes
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              <button 
+                onClick={() => setShowReviews(true)}
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                Reviews
+              </button>
+              <button 
+                onClick={() => setShowPrivacyModal(true)}
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                Privacy
+              </button>
+              <button 
+                onClick={() => setShowTermsModal(true)}
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                Terms
+              </button>
+            </div>
+            <div className="grid grid-cols-1 mt-2">
+              <button 
+                onClick={() => setShowEmergency(true)} // New Emergency Services button
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                Emergency Services
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop Footer */}
+          <div className="hidden sm:flex items-center justify-between text-sm">
+            {/* Left Side */}
+            <div className="flex items-center">
+              <Globe className="h-4 w-4 text-gray-500 mr-2" />
+              <span className="text-gray-600">Loading location...</span>
+            </div>
+            
+            {/* Center */}
+            <div className="flex items-center min-w-0">
+              <button 
+                onClick={() => setShowHowItWorks(true)}
+                className="text-gray-600 hover:text-gray-900 whitespace-nowrap ml-4"
+              >
+                How does it work?
+              </button>
+              <button 
+                onClick={() => setShowHiring(true)}
+                className="text-gray-600 hover:text-gray-900 whitespace-nowrap ml-4"
+              >
+                Hire your professional
+              </button>
+              <button 
+                onClick={() => setShowQuotes(true)}
+                className="text-gray-600 hover:text-gray-900 whitespace-nowrap ml-4"
+              >
+                Get quotes
+              </button>
+              <button 
+                onClick={() => setShowReviews(true)}
+                className="text-gray-600 hover:text-gray-900 whitespace-nowrap ml-4"
+              >
+                Reviews
+              </button>
+              <button 
+                onClick={() => setShowEmergency(true)} // New Emergency Services button
+                className="text-gray-600 hover:text-gray-900 whitespace-nowrap ml-4"
+              >
+                Emergency Services
+              </button>
+              <button 
+                onClick={() => setShowPrivacyModal(true)}
+                className="text-gray-600 hover:text-gray-900 whitespace-nowrap ml-4"
+              >
+                Privacy
+              </button>
+              <button 
+                onClick={() => setShowTermsModal(true)}
+                className="text-gray-600 hover:text-gray-900 whitespace-nowrap ml-4"
+              >
+                Terms
+              </button>
+            </div>
+
+            {/* Right Side - Removed Goldman services INC */}
+            <div className="flex whitespace-nowrap text-gray-600">
+              Kokobeo Inc.
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Modals */}
       <AnimatePresence>
@@ -1220,6 +1345,24 @@ const ProHomepage = () => {
                 <li>Provide detailed feedback</li>
                 <li>Help others make informed decisions</li>
                 <li>Build our global professional community</li>
+              </ul>
+            </div>
+          }
+        />
+
+        {/* New Emergency Services Popup */}
+        <InfoPopup
+          isOpen={showEmergency}
+          onClose={() => setShowEmergency(false)}
+          title="Emergency Services"
+          content={
+            <div className="space-y-4" style={{ textAlign: 'left' }}>
+              <p>Get immediate help with our international emergency services:</p>
+              <ul className="list-disc pl-4">
+                <li>Find professionals available 24/7 worldwide</li>
+                <li>Quick response for urgent international needs</li>
+                <li>Contact verified experts directly</li>
+                <li>Resolve emergencies efficiently across borders</li>
               </ul>
             </div>
           }

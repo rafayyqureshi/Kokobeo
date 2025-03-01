@@ -7,7 +7,7 @@ import {
   PieChart, BarChart2, Building2, MapPin, X,
   Bell, Camera, UserCheck, FileEdit, ChevronDown,
   ArrowUpRight, Link, Mail, Phone, Share2, CheckCircle,
-  ExternalLink, Briefcase, Users, Globe
+  ExternalLink, Briefcase, Users, Globe, Image, Video
 } from 'lucide-react';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/Button';
@@ -41,6 +41,10 @@ const QuoteForms = () => {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+  // State for preview file uploads
+  const [previewPhotos, setPreviewPhotos] = useState([]);
+  const [previewVideos, setPreviewVideos] = useState([]);
 
   // Mock data for quote forms
   const forms = [
@@ -217,6 +221,8 @@ const QuoteForms = () => {
               onClick={() => {
                 setSelectedForm(form);
                 setShowPreview(true);
+                setPreviewPhotos([]); // Reset photos on preview open
+                setPreviewVideos([]); // Reset videos on preview open
               }}
             >
               <Eye className="h-4 w-4" />
@@ -752,9 +758,19 @@ const QuoteForms = () => {
     );
   };
 
-  // Form Preview Component
+  // Form Preview Component (Updated)
   const FormPreview = ({ form, onClose }) => {
     if (!form) return null;
+
+    const handlePhotoUpload = (e) => {
+      const files = Array.from(e.target.files);
+      setPreviewPhotos((prev) => [...prev, ...files]);
+    };
+
+    const handleVideoUpload = (e) => {
+      const files = Array.from(e.target.files);
+      setPreviewVideos((prev) => [...prev, ...files]);
+    };
 
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ textAlign: 'left' }}>
@@ -885,6 +901,57 @@ const QuoteForms = () => {
                         placeholder="Enter province/state"
                       />
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Photos and Videos for Emergency Service Quote */}
+            {form.id === 1 && (
+              <div>
+                <div className="border-b pb-3 mt-6">
+                  <p className="text-sm text-gray-500">Media Uploads</p>
+                </div>
+
+                <div className="mt-4 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Upload Photos</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handlePhotoUpload}
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                    {previewPhotos.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {previewPhotos.map((photo, index) => (
+                          <div key={index} className="text-sm text-gray-600">
+                            {photo.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Upload Videos</label>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      multiple
+                      onChange={handleVideoUpload}
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                    {previewVideos.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {previewVideos.map((video, index) => (
+                          <div key={index} className="text-sm text-gray-600">
+                            {video.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

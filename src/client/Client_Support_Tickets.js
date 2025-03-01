@@ -23,6 +23,7 @@ const ClientSupportTickets = () => {
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [newMessage, setNewMessage] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [newReportModal, setNewReportModal] = useState(false); // New state for report modal
 
   // Sidebar items
   const sidebarItems = [
@@ -36,7 +37,7 @@ const ClientSupportTickets = () => {
     { icon: <User className="h-5 w-5" />, label: "Profile Settings", href: "/client/profilesettings" }
   ];
 
-  // Mock tickets data
+  // Mock tickets data (updated with report examples)
   const [tickets, setTickets] = useState([
     {
       id: "TKT-2024-001",
@@ -69,32 +70,30 @@ const ClientSupportTickets = () => {
       department: "Billing Support"
     },
     {
-      id: "TKT-2024-002",
-      subject: "Project Access Problems",
-      description: "Cannot access project dashboard after recent update",
-      status: "in_progress",
+      id: "RPT-2025-001",
+      subject: "Professional Working Outside Platform",
+      description: "A professional I hired tried to complete work outside the platform.",
+      status: "open",
       priority: "medium",
-      category: "Technical",
-      createdAt: "2024-01-19T15:20:00",
-      updatedAt: "2024-01-20T09:30:00",
+      category: "Report",
+      createdAt: "2025-02-28T09:15:00",
+      updatedAt: "2025-02-28T09:15:00",
       messages: [
         {
           id: 1,
           sender: "Emma Thompson",
           role: "client",
-          message: "After the recent update, I'm unable to access my project dashboard. Getting a 404 error.",
-          timestamp: "2024-01-19T15:20:00",
-          attachments: [
-            { name: "error_screenshot.png", size: "156 KB", type: "image/png" }
-          ]
+          message: "The professional I hired for plumbing asked me to pay them directly instead of through the platform.",
+          timestamp: "2025-02-28T09:15:00",
+          attachments: []
         }
       ],
-      assignee: "John Davis",
-      department: "Technical Support"
+      assignee: "Unassigned",
+      department: "Compliance"
     }
   ]);
 
-  // New ticket form initial state
+  // New ticket/report form initial state
   const [newTicket, setNewTicket] = useState({
     subject: '',
     description: '',
@@ -109,10 +108,14 @@ const ClientSupportTickets = () => {
     assignee: 'Unassigned'
   });
 
-  // Function to handle new ticket submission
-  const handleSubmitNewTicket = () => {
+  // Handle new ticket/report submission
+  const handleSubmitNewTicket = (isReport = false) => {
+    const ticketIdPrefix = isReport ? 'RPT' : 'TKT';
     const ticket = {
       ...newTicket,
+      id: `${ticketIdPrefix}-${new Date().getFullYear()}-${String(tickets.length + 1).padStart(3, '0')}`,
+      category: isReport ? 'Report' : newTicket.category,
+      department: isReport ? 'Compliance' : newTicket.department,
       messages: [{
         id: 1,
         sender: "Emma Thompson",
@@ -124,6 +127,7 @@ const ClientSupportTickets = () => {
     };
     setTickets([...tickets, ticket]);
     setShowNewTicketModal(false);
+    setNewReportModal(false);
     setNewTicket({
       subject: '',
       description: '',
@@ -133,8 +137,8 @@ const ClientSupportTickets = () => {
       createdAt: new Date().toISOString(),
       messages: [],
       attachments: [],
-      id: `TKT-${new Date().getFullYear()}-${String(tickets.length + 2).padStart(3, '0')}`,
-      department: 'General Support',
+      id: `${ticketIdPrefix}-${new Date().getFullYear()}-${String(tickets.length + 2).padStart(3, '0')}`,
+      department: isReport ? 'Compliance' : 'General Support',
       assignee: 'Unassigned'
     });
   };
@@ -291,6 +295,23 @@ const ClientSupportTickets = () => {
             </div>
           </div>
 
+          {/* Reports Section (Highlighted) */}
+          <Card className="p-6 mb-6 bg-blue-50 border-blue-200">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h2 className="text-xl font-semibold text-blue-900">Reports</h2>
+                <p className="text-blue-700">Report issues with professionals, disputes, or platform violations</p>
+              </div>
+              <Button
+                onClick={() => setNewReportModal(true)}
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+              >
+                <Flag className="w-4 h-4 mr-2" />
+                File a Report
+              </Button>
+            </div>
+          </Card>
+
           {/* Filters and Search */}
           <Card className="p-6 mb-6">
             <div className="flex flex-col sm:flex-row gap-4">
@@ -298,7 +319,7 @@ const ClientSupportTickets = () => {
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search tickets..."
+                  placeholder="Search tickets and reports..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border rounded-lg"
@@ -400,7 +421,7 @@ const ClientSupportTickets = () => {
                   <div className="p-6">
                     <form onSubmit={(e) => {
                       e.preventDefault();
-                      handleSubmitNewTicket();
+                      handleSubmitNewTicket(false);
                     }}>
                       <div className="space-y-4">
                         <div>
@@ -475,6 +496,97 @@ const ClientSupportTickets = () => {
                           disabled={!newTicket.subject || !newTicket.description || !newTicket.category}
                         >
                           Create Ticket
+                        </Button>
+                      </div>
+                    </form>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+
+          {/* New Report Modal */}
+          <AnimatePresence>
+            {newReportModal && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-white rounded-xl w-full max-w-2xl mx-4 overflow-hidden"
+                >
+                  <div className="p-6 border-b flex justify-between items-center">
+                    <h2 className="text-xl font-semibold">File a Report</h2>
+                    <button
+                      onClick={() => setNewReportModal(false)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="p-6">
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSubmitNewTicket(true);
+                    }}>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Subject
+                          </label>
+                          <input
+                            type="text"
+                            value={newTicket.subject}
+                            onChange={(e) => setNewTicket({...newTicket, subject: e.target.value})}
+                            className="w-full p-2 border rounded-lg"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Description
+                          </label>
+                          <textarea
+                            value={newTicket.description}
+                            onChange={(e) => setNewTicket({...newTicket, description: e.target.value})}
+                            className="w-full p-2 border rounded-lg"
+                            rows={4}
+                            required
+                            placeholder="Describe the issue (e.g., professional working outside platform, dispute, etc.)"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Priority
+                          </label>
+                          <select
+                            value={newTicket.priority}
+                            onChange={(e) => setNewTicket({...newTicket, priority: e.target.value})}
+                            className="w-full p-2 border rounded-lg"
+                          >
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 flex justify-end gap-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setNewReportModal(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="submit"
+                          disabled={!newTicket.subject || !newTicket.description}
+                        >
+                          Submit Report
                         </Button>
                       </div>
                     </form>

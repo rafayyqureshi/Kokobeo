@@ -7,7 +7,7 @@ import {
   ThumbsUp, Globe, FolderPlus, MessageSquare,
   AlertCircle, Check, FileText, Users, ArrowUpRight,
   Bell, Camera, Ban, ExternalLink, Lock, Unlock,
-  Facebook, Twitter, Instagram, Linkedin, Youtube
+  Facebook, Twitter, Instagram, Youtube
 } from 'lucide-react';
 import { Card } from '../../components/ui/card';
 import { Button } from '../../components/ui/Button';
@@ -15,6 +15,10 @@ import { Badge } from '../../components/ui/badge';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import AdminHeader from '../../Headers/AdminHeader';
 import SharedFooter2 from '../../Footer/SharedFooter2';
+
+// Note: lucide-react does not have a TikTok icon by default.
+// We'll use a placeholder (Globe) and note this for potential custom implementation.
+const Tiktok = Globe; // Placeholder; replace with custom TikTok icon if available.
 
 const HelpCenter = () => {
   // State management
@@ -30,15 +34,15 @@ const HelpCenter = () => {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState('faqs'); // Added activeTab state
+  const [activeTab, setActiveTab] = useState('faqs');
   const itemsPerPage = 5;
   
-  // Social Media URLs state
+  // Social Media URLs state (Updated: Removed LinkedIn, Added TikTok)
   const [socialMediaUrls, setSocialMediaUrls] = useState({
     facebook: "https://facebook.com/kokobeo",
     twitter: "https://twitter.com/kokobeo",
     instagram: "https://instagram.com/kokobeo",
-    linkedin: "https://linkedin.com/company/kokobeo",
+    tiktok: "https://tiktok.com/@kokobeo", // Added TikTok
     youtube: "https://youtube.com/c/kokobeo"
   });
 
@@ -280,7 +284,7 @@ const HelpCenter = () => {
     );
   };
 
-  // Social Media URLs Modal
+  // Social Media URLs Modal (Updated: Replaced LinkedIn with TikTok)
   const SocialMediaModal = ({ isOpen, onClose }) => {
     const [urls, setUrls] = useState({...socialMediaUrls});
 
@@ -348,7 +352,7 @@ const HelpCenter = () => {
                   Instagram URL
                 </label>
                 <input 
-                  type="text" 
+                 type="text" 
                   className="w-full px-3 py-2 border rounded-lg" 
                   value={urls.instagram}
                   onChange={(e) => setUrls({...urls, instagram: e.target.value})}
@@ -356,14 +360,14 @@ const HelpCenter = () => {
               </div>
               <div>
                 <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
-                  <Linkedin className="h-5 w-5 mr-2 text-blue-800" />
-                  LinkedIn URL
+                  <Tiktok className="h-5 w-5 mr-2 text-black" /> {/* Using placeholder Globe icon */}
+                  TikTok URL
                 </label>
                 <input 
                   type="text" 
                   className="w-full px-3 py-2 border rounded-lg" 
-                  value={urls.linkedin}
-                  onChange={(e) => setUrls({...urls, linkedin: e.target.value})}
+                  value={urls.tiktok}
+                  onChange={(e) => setUrls({...urls, tiktok: e.target.value})}
                 />
               </div>
               <div>
@@ -741,7 +745,7 @@ const HelpCenter = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentFaqs = faqs.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Social Media Section
+  // Social Media Section (Updated: Replaced LinkedIn with TikTok)
   const SocialMediaSection = () => (
     <Card className="p-6">
       <div className="flex justify-between items-start mb-6">
@@ -807,17 +811,17 @@ const HelpCenter = () => {
         </div>
         
         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-          <Linkedin className="h-5 w-5 text-blue-800" />
+          <Tiktok className="h-5 w-5 text-black" /> {/* Placeholder icon */}
           <div className="flex-grow">
-            <div className="font-medium">LinkedIn</div>
+            <div className="font-medium">TikTok</div>
             <div className="text-sm text-gray-600 mt-1 overflow-hidden text-ellipsis">
               <a 
-                href={socialMediaUrls.linkedin} 
+                href={socialMediaUrls.tiktok} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:underline text-blue-600 flex items-center gap-1"
               >
-                <ExternalLink className="h-3 w-3" />{socialMediaUrls.linkedin}
+                <ExternalLink className="h-3 w-3" />{socialMediaUrls.tiktok}
               </a>
             </div>
           </div>
@@ -1136,6 +1140,8 @@ const HelpCenter = () => {
         onClose={() => setShowPermissionModal(false)}
         user={selectedUser}
       />
+
+      <SharedFooter2 />
     </div>
   );
 };
